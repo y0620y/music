@@ -1,13 +1,5 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/login">Login</router-link> |
-      <router-link to="/">音乐专辑管理</router-link> |
-      <router-link to="/client">爬虫程序</router-link> |
-      <router-link to="/mongoose">存入程序</router-link> |
-      <router-link to="/mocha">mocha测试</router-link> |
-      <router-link to="/test">接口的测试地址</router-link> |
-    </div>
     <router-view/>
   </div>
 </template>

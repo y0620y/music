@@ -13,9 +13,10 @@ Vue.use(VueRouter)
 
 const routes = [
   {
-    path: '/',
+    path: '/home',
     name: 'Music',
-    component: Music
+    component: Music,
+    meta: { requireAuth: true }
   },
   {
     path: '/login',
@@ -43,7 +44,7 @@ const routes = [
     component: Test
   },
 
-  
+
 ]
 const router = new VueRouter({
   mode: 'hash',

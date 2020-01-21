@@ -1,5 +1,47 @@
 <template>
   <div>
+    <div class="top-nav">
+      <!-- <h2 class="title">新华音乐管理平台</h2> -->
+      <el-menu
+        :default-active="activeIndex2"
+        class="el-menu"
+        mode="horizontal"
+        background-color="#545c64"
+        text-color="#fff"
+        active-text-color="#ffd04b"
+      >
+        <el-menu-item class="title">新华音乐管理平台</el-menu-item>
+        <el-menu-item index="1">专辑管理</el-menu-item>
+        <el-menu-item index="2">歌手管理</el-menu-item>
+        <el-submenu index="3">
+          <template slot="title">我的</template>
+          <el-menu-item index="2-1">修改密码</el-menu-item>
+          <el-menu-item index="2-2" @click="exit">退出</el-menu-item>
+        </el-submenu>
+      </el-menu>
+    </div>
+
+    <el-table :data="albums" class="list">
+      <!-- <el-table-column prop="album_id" label="album_id" width="180"></el-table-column> -->
+      <el-table-column prop="album_name" label="专辑名" width="200"></el-table-column>
+      <el-table-column prop="price" label="价格"></el-table-column>
+      <el-table-column prop="singers" label="歌手名">
+        <template slot-scope="scope">
+          <span>{{ scope.row.singers && scope.row.singers[0] && scope.row.singers[0].singer_name }}</span>
+          <span v-if="scope.row.singers.length>1">等人</span>
+        </template>
+      </el-table-column>
+      <el-table-column fixed="right" label="操作">
+        <template slot-scope="scope">
+          <el-button @click="showAlbumDetail(scope.row)" type="text" size="small">详情</el-button>
+          <el-button @click="showAdd(scope.row)" type="text" size="small">新增</el-button>
+          <el-button @click="showEdit(scope.row)" type="text" size="small">编辑</el-button>
+          <el-button @click="deleteAlbum(scope.row)" type="text" size="small">删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+
+    <!-- 详情 -->
     <el-dialog :visible.sync="detailVisible" width="30%">
       <span class="title">详细信息</span>
       <div class="detailBox">
@@ -21,13 +63,31 @@
           <img :src="albumDetail.cover" />
         </div>
         <span slot="footer" class="dialog-footer">
-          <el-button @click="dialogVisible = false">取 消</el-button>
-          <el-button type="primary" @click="editAlbum">确 定</el-button>
+          <el-button @click="detailVisible = false">取 消</el-button>
+          <el-button type="primary" @click="detailVisible = false">确 定</el-button>
         </span>
       </div>
     </el-dialog>
 
-    <el-dialog :visible.sync="dialogVisible" width="30%">
+    <!-- 新增 -->
+    <el-dialog :visible.sync="addVisible" width="30%">
+      <span>新增专辑</span>
+      <el-form :inline="true" :model="album" class="add-form">
+        <el-form-item label="专辑名称">
+          <el-input v-model="album.album_name" placeholder="请输入专辑名"></el-input>
+        </el-form-item>
+        <el-form-item label="专辑价格">
+          <el-input v-model.number="album.price" type="number" placeholder="请输入价格"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="addVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addAlbum">确 定</el-button>
+      </span>
+    </el-dialog>
+
+    <!-- 修改 -->
+    <el-dialog :visible.sync="editVisible" width="30%">
       <span>修改信息</span>
       <el-form label-width="100px" :model="chooseAlbum">
         <el-form-item label="专辑名称">
@@ -39,58 +99,10 @@
         <el-form-item></el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button @click="editVisible = false">取 消</el-button>
         <el-button type="primary" @click="editAlbum">确 定</el-button>
       </span>
     </el-dialog>
-
-    <el-dialog :visible.sync="singerVisible" width="30%">
-      <span>新增歌手</span>
-      <el-form label-width="100px" :model="chooseAlbum">
-        <el-form-item label="歌手名">
-          <el-input placeholder="请输入歌手名"></el-input>
-        </el-form-item>
-        <el-form-item></el-form-item>
-      </el-form>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="singerVisible = false">取 消</el-button>
-        <el-button @click="singerVisible = false">确 定</el-button>
-      </span>
-    </el-dialog>
-
-    <h1>Album Manager</h1>
-    <el-form :inline="true" :model="album" class="add-form">
-      <el-form-item label="专辑名称">
-        <el-input v-model="album.album_name" placeholder="请输入专辑名"></el-input>
-      </el-form-item>
-      <el-form-item label="专辑价格">
-        <el-input v-model.number="album.price" type="number" placeholder="请输入价格"></el-input>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="addAlbum">添加专辑</el-button>
-      </el-form-item>
-    </el-form>
-
-    <el-table :data="albums" class="list">
-      <el-table-column prop="album_id" label="album_id" width="180"></el-table-column>
-      <el-table-column prop="album_name" label="专辑名" width="300"></el-table-column>
-      <el-table-column prop="price" label="价格"></el-table-column>
-      <el-table-column prop="singers" label="歌手名">
-        <template slot-scope="scope">
-          <span>{{ scope.row.singers && scope.row.singers[0] && scope.row.singers[0].singer_name }}</span>
-          <span v-if="scope.row.singers.length>1">等人</span>
-        </template>
-      </el-table-column>
-      <el-table-column fixed="right" label="操作">
-        <template slot-scope="scope">
-          <el-button @click="showAlbumDetail(scope.row)" type="text" size="small">详细内容</el-button>
-          <el-button @click="showEdit(scope.row)" type="text" size="small">编辑</el-button>
-          <el-button @click="addSinger(scope.row)" type="text" size="small">追加歌手</el-button>
-          <el-button @click="deleteAlbum(scope.row)" type="text" size="small">删除</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-    <!-- <h2>总价格： {{priceTotal}}</h2> -->
   </div>
 </template>
 
@@ -103,10 +115,13 @@ export default {
   },
   data() {
     return {
+      activeIndex: "1",
+      activeIndex2: "1",
       url: "http://localhost:3000/albums",
       maxId: 2,
       album: { album_name: "", price: "" },
-      dialogVisible: false,
+      addVisible: false,
+      editVisible: false,
       detailVisible: false,
       singerVisible: false,
       chooseAlbum: {},
@@ -131,7 +146,7 @@ export default {
         });
     },
     editAlbum() {
-      this.dialogVisible = false;
+      this.editVisible = false;
       fetch(this.url, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -143,8 +158,12 @@ export default {
           this.getList();
         });
     },
+    showAdd(album) {
+      this.addVisible = true;
+      this.chooseAlbum = _.cloneDeep(album);
+    },
     showEdit(album) {
-      this.dialogVisible = true;
+      this.editVisible = true;
       this.chooseAlbum = _.cloneDeep(album);
     },
     handleClose() {},
@@ -164,6 +183,12 @@ export default {
       })
         .then(res => res.json())
         .then(nb => this.albums.push(nb));
+    },
+    exit() {
+      let flag = false;
+      this.$store.commit("login", flag);
+      this.$router.push("/login");
+      window.console.log("退出登录");
     }
   },
   computed: {
@@ -174,7 +199,21 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+.top-nav {
+  background-color: rgb(84, 92, 100);
+  .el-menu {
+    width: 70%;
+    margin: 0 auto;
+  }
+}
+.title {
+  color: #fff;
+  font-size: 18px;
+  &:hover {
+    background-color: rgb(84, 92, 100) !important;
+  }
+}
 .list {
   width: 70%;
   margin: 0 auto;

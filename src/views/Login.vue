@@ -1,40 +1,27 @@
 <template>
-  <div id="app">
-    <div>
-      <p v-if="currentUser!=null">
-        欢迎:{{currentUser.uname}},
-        <a @click.prevent="currentUser=null" href=" ">退出登录</a>
-      </p>
-      <p v-else>
-        <a @click="showLoginForm" href="#">请登录</a>
-      </p>
-    </div>
-    <div v-show="show" style="width:400px">
-      <!-- <form @submit.prevent="login" action="#">
-        <input type="text" ref="uname" />
-        <input type="password" ref="password" />
-        <input type="submit" />
-      </form>-->
-
-      <!-- <form @submit.prevent="login" action="#">
-        <input type="text" v-model="inputUser.uname" />
-        <input type="password" v-model="inputUser.password" />
-        <input type="submit" />
-      </form>-->
-
-      <el-form label-width="100px" :model="inputUser">
-        <el-form-item label="用户名">
-          <el-input placeholder="请输入用户名" v-model="inputUser.uname"></el-input>
-        </el-form-item>
-        <el-form-item label="密码">
-          <el-input placeholder="请输入密码" v-model="inputUser.password" show-password></el-input>
-        </el-form-item>
-        <p class="errorMsg">{{errorMsg}}</p>
-        <el-form-item>
-          <el-button type="primary" @click="login">登录</el-button>
-        </el-form-item>
-      </el-form>
-    </div>
+  <div>
+    <el-header>
+      <Header></Header>
+    </el-header>
+    <el-form
+      ref="AccountFrom"
+      :model="inputUser"
+      :rules="rules"
+      label-position="left"
+      label-width="0px"
+      class="demo-ruleForm login-container"
+    >
+      <h3 class="title">用户登录</h3>
+      <el-form-item prop="username">
+        <el-input type="text" v-model="inputUser.uname" auto-complete="off" placeholder="账号"></el-input>
+      </el-form-item>
+      <el-form-item prop="pwd">
+        <el-input type="password" v-model="inputUser.password" auto-complete="off" placeholder="密码"></el-input>
+      </el-form-item>
+      <el-form-item style="width:100%;">
+        <el-button type="primary" style="width:100%;" @click="login">登录</el-button>
+      </el-form-item>
+    </el-form>
   </div>
 </template>
 
@@ -44,18 +31,24 @@ export default {
     return {
       url: "http://localhost:3000/users",
       currentUser: null,
-      show: false,
       users: [],
       inputUser: {},
-      errorMsg: ""
+      errorMsg: "",
+      rules: {
+        uname: [
+          { required: true, message: "请输入账号", trigger: "blur" }
+          //{ validator: validaePass }
+        ],
+        password: [
+          { required: true, message: "请输入密码", trigger: "blur" }
+          //{ validator: validaePass2 }
+        ]
+      }
     };
   },
   props: {},
   computed: {},
   methods: {
-    showLoginForm() {
-      this.show = true;
-    },
     login() {
       // let uname = this.$refs.uname.value;
       // let psd = this.$refs.password.value;
@@ -65,27 +58,11 @@ export default {
           item.password == this.inputUser.password
       );
       if (index >= 0) {
-        this.currentUser = { uname: this.users[index].uname };
-        this.show = false;
+        let flag = true;
+        this.$store.commit("login", flag);
+        this.$router.push("/home");
+        window.console.log("登录成功");
       }
-    }
-  },
-  filters: {
-    formatDate: function(value) {
-      if (!value) return "";
-      let date = new Date(value);
-      let y = date.getFullYear();
-      let MM = date.getMonth() + 1;
-      MM = MM < 10 ? "0" + MM : MM;
-      let d = date.getDate();
-      d = d < 10 ? "0" + d : d;
-      let h = date.getHours();
-      h = h < 10 ? "0" + h : h;
-      let m = date.getMinutes();
-      m = m < 10 ? "0" + m : m;
-      let s = date.getSeconds();
-      s = s < 10 ? "0" + s : s;
-      return y + "-" + MM + "-" + d + " " + h + ":" + m + ":" + s;
     }
   },
   created() {
@@ -106,12 +83,42 @@ export default {
 };
 </script>
 
-<style scoped>
-.errorMsg {
-  padding-left: 100px;
-  margin-top: 0;
-  color: #f56c6c;
-  font-size: 12px;
-  text-align: left;
+<style lang="scss" scoped>
+.login-container {
+  /*box-shadow: 0 0px 8px 0 rgba(0, 0, 0, 0.06), 0 1px 0px 0 rgba(0, 0, 0, 0.02);*/
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  background-clip: padding-box;
+  margin: 160px auto;
+  width: 350px;
+  padding: 35px 35px 15px 35px;
+  background: #fff;
+  border: 1px solid #eaeaea;
+  box-shadow: 0 0 25px #cac6c6;
+  background: -ms-linear-gradient(top, #ace, #00c1de); /* IE 10 */
+  background: -moz-linear-gradient(top, #ace, #00c1de); /*火狐*/
+  background: -webkit-gradient(
+    linear,
+    0% 0%,
+    0% 100%,
+    from(#ace),
+    to(#00c1de)
+  ); /*谷歌*/
+  background: -webkit-linear-gradient(
+    top,
+    #ace,
+    #00c1de
+  ); /*Safari5.1 Chrome 10+*/
+  background: -o-linear-gradient(top, #ace, #00c1de); /*Opera 11.10+*/
+
+  .title {
+    margin: 0px auto 40px auto;
+    text-align: center;
+    color: #505458;
+  }
+  .remember {
+    margin: 0px 0px 35px 0px;
+  }
 }
 </style>
