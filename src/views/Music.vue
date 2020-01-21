@@ -43,35 +43,38 @@
 
     <!-- 详情 -->
     <el-dialog :visible.sync="detailVisible" width="30%">
-      <span class="title">详细信息</span>
+      <h3 class="dialog-title">详细信息</h3>
       <div class="detailBox">
         <p>
-          <span>专辑名称:</span>
+          <span class="detail-desc">专辑名称：</span>
           <span>{{albumDetail.album_name}}</span>
         </p>
         <p>
-          <span>价格:</span>
+          <span class="detail-desc">价格：</span>
           <span>{{albumDetail.price}}</span>
         </p>
         <div>
-          <span>歌手:</span>
-          <ul>
-            <li v-for="(item, index) in albumDetail.singers" :key="index">{{item.singer_name}}</li>
-          </ul>
+          <span class="detail-desc">歌手：</span>
+          <el-tag
+            class="singer-tag"
+            v-for="(item, index) in albumDetail.singers"
+            :key="index"
+          >{{item.singer_name}}</el-tag>
         </div>
-        <div>
+        <div class="cover-box">
+          <span class="detail-desc">封面图：</span>
           <img :src="albumDetail.cover" />
         </div>
-        <span slot="footer" class="dialog-footer">
+        <div slot="footer" class="dialog-footer">
           <el-button @click="detailVisible = false">取 消</el-button>
           <el-button type="primary" @click="detailVisible = false">确 定</el-button>
-        </span>
+        </div>
       </div>
     </el-dialog>
 
     <!-- 新增 -->
     <el-dialog :visible.sync="addVisible" width="30%">
-      <span>新增专辑</span>
+      <h3 class="dialog-title">新增专辑</h3>
       <el-form :inline="true" :model="album" class="add-form">
         <el-form-item label="专辑名称">
           <el-input v-model="album.album_name" placeholder="请输入专辑名"></el-input>
@@ -80,15 +83,15 @@
           <el-input v-model.number="album.price" type="number" placeholder="请输入价格"></el-input>
         </el-form-item>
       </el-form>
-      <span slot="footer" class="dialog-footer">
+      <div slot="footer" class="dialog-footer">
         <el-button @click="addVisible = false">取 消</el-button>
         <el-button type="primary" @click="addAlbum">确 定</el-button>
-      </span>
+      </div>
     </el-dialog>
 
     <!-- 修改 -->
     <el-dialog :visible.sync="editVisible" width="30%">
-      <span>修改信息</span>
+      <h3 class="dialog-title">修改信息</h3>
       <el-form label-width="100px" :model="chooseAlbum">
         <el-form-item label="专辑名称">
           <el-input placeholder="请输入专辑名称" v-model="chooseAlbum.album_name"></el-input>
@@ -98,10 +101,10 @@
         </el-form-item>
         <el-form-item></el-form-item>
       </el-form>
-      <span slot="footer" class="dialog-footer">
+      <div slot="footer" class="dialog-footer">
         <el-button @click="editVisible = false">取 消</el-button>
         <el-button type="primary" @click="editAlbum">确 定</el-button>
-      </span>
+      </div>
     </el-dialog>
   </div>
 </template>
@@ -221,5 +224,31 @@ export default {
 .detailBox {
   text-align: left;
   margin: 20px;
+  p {
+    height: 30px;
+    line-height: 30px;
+  }
+  .singer-tag {
+    margin-right: 10px;
+  }
+  .detail-desc {
+    display: inline-block;
+    // min-width: 100px;
+    margin-right: 4px;
+    // text-align: right;
+  }
+  .cover-box {
+    margin: 10px 0;
+    img {
+      width: 120px;
+    }
+  }
+}
+.dialog-title {
+  font-weight: bold;
+  font-size: 16px;
+}
+.dialog-footer {
+  text-align: center;
 }
 </style>
