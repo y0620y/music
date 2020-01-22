@@ -10,7 +10,7 @@
         text-color="#fff"
         active-text-color="#ffd04b"
       >
-        <el-menu-item class="title">新华音乐管理平台</el-menu-item>
+        <el-menu-item class="top-title">新华音乐管理平台</el-menu-item>
         <el-menu-item index="1">专辑管理</el-menu-item>
         <el-menu-item index="2">歌手管理</el-menu-item>
         <el-submenu index="3">
@@ -20,7 +20,9 @@
         </el-submenu>
       </el-menu>
     </div>
-
+    <div class="operate-box">
+      <el-button class="add-btn" type="primary" @click="showAdd">新增专辑</el-button>
+    </div>
     <el-table :data="albums" class="list">
       <!-- <el-table-column prop="album_id" label="album_id" width="180"></el-table-column> -->
       <el-table-column prop="album_name" label="专辑名" width="200"></el-table-column>
@@ -34,7 +36,6 @@
       <el-table-column fixed="right" label="操作">
         <template slot-scope="scope">
           <el-button @click="showAlbumDetail(scope.row)" type="text" size="small">详情</el-button>
-          <el-button @click="showAdd(scope.row)" type="text" size="small">新增</el-button>
           <el-button @click="showEdit(scope.row)" type="text" size="small">编辑</el-button>
           <el-button @click="deleteAlbum(scope.row)" type="text" size="small">删除</el-button>
         </template>
@@ -75,12 +76,31 @@
     <!-- 新增 -->
     <el-dialog :visible.sync="addVisible" width="30%">
       <h3 class="dialog-title">新增专辑</h3>
-      <el-form :inline="true" :model="album" class="add-form">
+      <el-form label-width="100px" :model="album" class="add-form">
         <el-form-item label="专辑名称">
           <el-input v-model="album.album_name" placeholder="请输入专辑名"></el-input>
         </el-form-item>
         <el-form-item label="专辑价格">
           <el-input v-model.number="album.price" type="number" placeholder="请输入价格"></el-input>
+        </el-form-item>
+        <el-form-item label="歌手" class="singers-box">
+          <el-tag
+            :key="index"
+            v-for="(item, index) in album.singers"
+            closable
+            size="small"
+            :disable-transitions="false"
+            @close="handleClose(item)"
+          >{{item.singer_name}}</el-tag>
+          <el-input
+            class="input-new-tag"
+            v-if="inputVisible"
+            v-model="inputValue"
+            ref="saveTagInput"
+            @keyup.enter.native="handleInputConfirm"
+            @blur="handleInputConfirm"
+          ></el-input>
+          <el-button class="button-new-tag" size="small" @click="showAddSinger">+ 歌手</el-button>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -122,17 +142,38 @@ export default {
       activeIndex2: "1",
       url: "http://localhost:3000/albums",
       maxId: 2,
-      album: { album_name: "", price: "" },
+      album: { album_name: "", price: "", singers: [] },
       addVisible: false,
       editVisible: false,
       detailVisible: false,
       singerVisible: false,
       chooseAlbum: {},
       albumDetail: {},
-      albums: []
+      albums: [],
+      inputVisible: false,
+      inputValue: ""
     };
   },
   methods: {
+    handleClose(tag) {
+      this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);
+    },
+    showAddSinger() {
+      this.inputVisible = true;
+      this.$nextTick(() => {
+        this.$refs.saveTagInput.$refs.input.focus();
+      });
+    },
+    handleInputConfirm() {
+      let inputValue = this.inputValue;
+      if (inputValue) {
+        this.album.singers.push({
+          singer_name: inputValue
+        });
+      }
+      this.inputVisible = false;
+      this.inputValue = "";
+    },
     addSinger() {
       this.singerVisible = true;
     },
@@ -161,15 +202,13 @@ export default {
           this.getList();
         });
     },
-    showAdd(album) {
+    showAdd() {
       this.addVisible = true;
-      this.chooseAlbum = _.cloneDeep(album);
     },
     showEdit(album) {
       this.editVisible = true;
       this.chooseAlbum = _.cloneDeep(album);
     },
-    handleClose() {},
     deleteAlbum(album) {
       fetch(this.url + "/" + album._id, { method: "DELETE" })
         .then(res => res.json())
@@ -185,7 +224,10 @@ export default {
         body: JSON.stringify(this.album)
       })
         .then(res => res.json())
-        .then(nb => this.albums.push(nb));
+        .then(nb => {
+          this.albums.push(nb);
+          this.addVisible = false;
+        });
     },
     exit() {
       let flag = false;
@@ -210,7 +252,7 @@ export default {
     margin: 0 auto;
   }
 }
-.title {
+.top-title {
   color: #fff;
   font-size: 18px;
   &:hover {
@@ -221,6 +263,16 @@ export default {
   width: 70%;
   margin: 0 auto;
 }
+.operate-box {
+  width: 70%;
+  margin: 0 auto;
+  text-align: right;
+  .add-btn {
+    position: relative;
+    margin: 20px 0;
+  }
+}
+
 .detailBox {
   text-align: left;
   margin: 20px;
@@ -245,10 +297,28 @@ export default {
   }
 }
 .dialog-title {
+  margin-bottom: 20px;
   font-weight: bold;
   font-size: 16px;
 }
 .dialog-footer {
   text-align: center;
+}
+.singers-box {
+  .el-tag + .el-tag {
+    margin-left: 10px;
+  }
+  .button-new-tag {
+    margin-left: 10px;
+    height: 32px;
+    line-height: 30px;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  .input-new-tag {
+    width: 90px;
+    margin-left: 10px;
+    vertical-align: bottom;
+  }
 }
 </style>
