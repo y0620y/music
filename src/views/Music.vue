@@ -112,17 +112,35 @@
     <!-- 修改 -->
     <el-dialog :visible.sync="editVisible" width="30%">
       <h3 class="dialog-title">修改信息</h3>
-      <el-form label-width="100px" :model="chooseAlbum">
+      <el-form label-width="100px" :model="album">
         <el-form-item label="专辑名称">
-          <el-input placeholder="请输入专辑名称" v-model="chooseAlbum.album_name"></el-input>
+          <el-input placeholder="请输入专辑名称" v-model="album.album_name"></el-input>
         </el-form-item>
         <el-form-item label="专辑价格">
-          <el-input placeholder="请输入专辑价格" v-model="chooseAlbum.price"></el-input>
+          <el-input placeholder="请输入专辑价格" v-model="album.price"></el-input>
         </el-form-item>
-        <el-form-item></el-form-item>
+        <el-form-item label="歌手" class="singers-box">
+          <el-tag
+            :key="index"
+            v-for="(item, index) in album.singers"
+            closable
+            size="small"
+            :disable-transitions="false"
+            @close="handleClose(item)"
+          >{{item.singer_name}}</el-tag>
+          <el-input
+            class="input-new-tag"
+            v-if="inputVisible"
+            v-model="inputValue"
+            ref="saveTagInput"
+            @keyup.enter.native="handleInputConfirm"
+            @blur="handleInputConfirm"
+          ></el-input>
+          <el-button class="button-new-tag" size="small" @click="showAddSinger">+ 歌手</el-button>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="editVisible = false">取 消</el-button>
+        <el-button @click="closeEdit">取 消</el-button>
         <el-button type="primary" @click="editAlbum">确 定</el-button>
       </div>
     </el-dialog>
@@ -189,25 +207,31 @@ export default {
           window.console.log(this.albums);
         });
     },
+    closeEdit() {
+      this.albumInit();
+      this.editVisible = false;
+    },
     editAlbum() {
       this.editVisible = false;
       fetch(this.url, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(this.chooseAlbum)
+        body: JSON.stringify(this.album)
       })
         .then(res => res.json())
         .then(nb => {
           window.console.log(nb);
           this.getList();
+          this.albumInit();
         });
     },
     showAdd() {
+      this.albumInit();
       this.addVisible = true;
     },
     showEdit(album) {
       this.editVisible = true;
-      this.chooseAlbum = _.cloneDeep(album);
+      this.album = _.cloneDeep(album);
     },
     deleteAlbum(album) {
       fetch(this.url + "/" + album._id, { method: "DELETE" })
@@ -225,9 +249,13 @@ export default {
       })
         .then(res => res.json())
         .then(nb => {
+          this.albumInit();
           this.albums.push(nb);
           this.addVisible = false;
         });
+    },
+    albumInit() {
+      this.album = { album_name: "", price: "", singers: [] };
     },
     exit() {
       let flag = false;
