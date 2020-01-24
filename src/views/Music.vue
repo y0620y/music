@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="music-wrap">
     <div class="top-nav">
       <!-- <h2 class="title">新华音乐管理平台</h2> -->
       <el-menu
@@ -43,7 +43,7 @@
     </el-table>
 
     <!-- 详情 -->
-    <el-dialog :visible.sync="detailVisible" width="30%">
+    <el-dialog :visible.sync="detailVisible" width="40%">
       <h3 class="dialog-title">详细信息</h3>
       <div class="detailBox">
         <p>
@@ -74,7 +74,7 @@
     </el-dialog>
 
     <!-- 新增 -->
-    <el-dialog :visible.sync="addVisible" width="30%">
+    <el-dialog :visible.sync="addVisible" width="40%">
       <h3 class="dialog-title">新增专辑</h3>
       <el-form label-width="100px" :model="album" class="add-form">
         <el-form-item label="专辑名称">
@@ -90,7 +90,7 @@
             closable
             size="small"
             :disable-transitions="false"
-            @close="handleClose(item)"
+            @close="tagClose(item)"
           >{{item.singer_name}}</el-tag>
           <el-input
             class="input-new-tag"
@@ -102,6 +102,27 @@
           ></el-input>
           <el-button class="button-new-tag" size="small" @click="showAddSinger">+ 歌手</el-button>
         </el-form-item>
+        <el-form-item label="专辑封面">
+          <el-upload
+            class="upload-demo"
+            drag
+            :action="uploadUrl"
+            list-type="picture"
+            :on-success="uploadSussess"
+            :on-remove="coverRemove"
+            ref="album-upload"
+            :limit="1"
+          >
+            <div class="upload-btn">
+              <i class="el-icon-upload"></i>
+              <div class="el-upload__text">
+                将文件拖到此处，或
+                <em>点击上传</em>
+              </div>
+              <!-- <div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过500kb</div> -->
+            </div>
+          </el-upload>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="addVisible = false">取 消</el-button>
@@ -110,7 +131,7 @@
     </el-dialog>
 
     <!-- 修改 -->
-    <el-dialog :visible.sync="editVisible" width="30%">
+    <el-dialog :visible.sync="editVisible" width="40%">
       <h3 class="dialog-title">修改信息</h3>
       <el-form label-width="100px" :model="album">
         <el-form-item label="专辑名称">
@@ -126,7 +147,7 @@
             closable
             size="small"
             :disable-transitions="false"
-            @close="handleClose(item)"
+            @close="tagClose(item)"
           >{{item.singer_name}}</el-tag>
           <el-input
             class="input-new-tag"
@@ -156,15 +177,18 @@ export default {
   },
   data() {
     return {
+      fileList: [],
       activeIndex: "1",
       activeIndex2: "1",
       url: "http://localhost:3000/albums",
+      uploadUrl: "http://localhost:3000/upload/album",
       maxId: 2,
-      album: { album_name: "", price: "", singers: [] },
+      album: { album_name: "", price: "", cover: "", singers: [] },
       addVisible: false,
       editVisible: false,
       detailVisible: false,
       singerVisible: false,
+      uploadStatus: true,
       chooseAlbum: {},
       albumDetail: {},
       albums: [],
@@ -173,8 +197,25 @@ export default {
     };
   },
   methods: {
-    handleClose(tag) {
-      this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);
+    clearFiles() {
+      this.$refs["album-upload"].clearFiles();
+    },
+    coverRemove(file, fileList) {
+      window.console.log(file, fileList);
+      this.clearFiles();
+      this.uploadStatus = true;
+    },
+    uploadSussess(response) {
+      if (response.status === 0) {
+        this.album.cover = response.data.url;
+        this.uploadStatus = false;
+      }
+    },
+    tagClose(singer) {
+      var index = this.album.singers.findIndex(
+        item => item.singer_name == singer.singer_name
+      );
+      this.album.singers.splice(index, 1);
     },
     showAddSinger() {
       this.inputVisible = true;
@@ -252,10 +293,13 @@ export default {
           this.albumInit();
           this.albums.push(nb);
           this.addVisible = false;
+          // 清掉上传的图片
+          this.clearFiles();
         });
     },
     albumInit() {
-      this.album = { album_name: "", price: "", singers: [] };
+      this.uploadStatus = true;
+      this.album = { album_name: "", price: "", cover: "", singers: [] };
     },
     exit() {
       let flag = false;
@@ -273,80 +317,84 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.top-nav {
-  background-color: rgb(84, 92, 100);
-  .el-menu {
+.music-wrap {
+  .top-nav {
+    background-color: rgb(84, 92, 100);
+    .el-menu {
+      width: 70%;
+      margin: 0 auto;
+    }
+  }
+  .top-title {
+    color: #fff;
+    font-size: 18px;
+    &:hover {
+      background-color: rgb(84, 92, 100) !important;
+    }
+  }
+  .list {
     width: 70%;
     margin: 0 auto;
   }
-}
-.top-title {
-  color: #fff;
-  font-size: 18px;
-  &:hover {
-    background-color: rgb(84, 92, 100) !important;
-  }
-}
-.list {
-  width: 70%;
-  margin: 0 auto;
-}
-.operate-box {
-  width: 70%;
-  margin: 0 auto;
-  text-align: right;
-  .add-btn {
-    position: relative;
-    margin: 20px 0;
-  }
-}
-
-.detailBox {
-  text-align: left;
-  margin: 20px;
-  p {
-    height: 30px;
-    line-height: 30px;
-  }
-  .singer-tag {
-    margin-right: 10px;
-  }
-  .detail-desc {
-    display: inline-block;
-    // min-width: 100px;
-    margin-right: 4px;
-    // text-align: right;
-  }
-  .cover-box {
-    margin: 10px 0;
-    img {
-      width: 120px;
+  .operate-box {
+    width: 70%;
+    margin: 0 auto;
+    text-align: right;
+    .add-btn {
+      position: relative;
+      margin: 20px 0;
     }
   }
-}
-.dialog-title {
-  margin-bottom: 20px;
-  font-weight: bold;
-  font-size: 16px;
-}
-.dialog-footer {
-  text-align: center;
-}
-.singers-box {
-  .el-tag + .el-tag {
-    margin-left: 10px;
+
+  .detailBox {
+    text-align: left;
+    margin: 20px;
+    p {
+      height: 30px;
+      line-height: 30px;
+    }
+    .singer-tag {
+      margin-right: 10px;
+    }
+    .detail-desc {
+      display: inline-block;
+      // min-width: 100px;
+      margin-right: 4px;
+      // text-align: right;
+    }
+    .cover-box {
+      margin: 10px 0;
+      img {
+        width: 120px;
+      }
+    }
   }
-  .button-new-tag {
-    margin-left: 10px;
-    height: 32px;
-    line-height: 30px;
-    padding-top: 0;
-    padding-bottom: 0;
+  .dialog-title {
+    margin-bottom: 20px;
+    font-weight: bold;
+    font-size: 16px;
   }
-  .input-new-tag {
-    width: 90px;
-    margin-left: 10px;
-    vertical-align: bottom;
+  .dialog-footer {
+    text-align: center;
+  }
+  .singers-box {
+    .el-tag {
+      margin-right: 10px;
+    }
+    .el-tag + .el-tag {
+      margin: 0 10px;
+    }
+    .button-new-tag {
+      height: 32px;
+      line-height: 30px;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+    .input-new-tag {
+      width: 90px;
+      margin-right: 10px;
+      vertical-align: bottom;
+    }
   }
 }
 </style>
