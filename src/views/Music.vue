@@ -19,6 +19,17 @@
           <el-menu-item index="2-2" @click="exit">退出</el-menu-item>
         </el-submenu>
       </el-menu>
+
+      <div class="search-box">
+        <el-input
+          class="search-input"
+          v-model="keyword"
+          placeholder="请输入内容"
+          prefix-icon="el-icon-search"
+          @keyup.enter.native="searchAlbum"
+        ></el-input>
+        <el-button type="primary" @click="searchAlbum">搜索</el-button>
+      </div>
     </div>
     <div class="operate-box">
       <el-button class="add-btn" type="primary" @click="showAdd">新增专辑</el-button>
@@ -31,6 +42,11 @@
         <template slot-scope="scope">
           <span>{{ scope.row.singers && scope.row.singers[0] && scope.row.singers[0].singer_name }}</span>
           <span v-if="scope.row.singers.length>1">等人</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="cover" label="封面图">
+        <template slot-scope="scope">
+          <img :src="scope.row.cover" class="album-cover" />
         </template>
       </el-table-column>
       <el-table-column fixed="right" label="操作">
@@ -159,6 +175,28 @@
           ></el-input>
           <el-button class="button-new-tag" size="small" @click="showAddSinger">+ 歌手</el-button>
         </el-form-item>
+        <el-form-item label="专辑封面">
+          <el-upload
+            class="upload-demo"
+            drag
+            :action="uploadUrl"
+            list-type="picture"
+            :on-success="uploadSussess"
+            :on-remove="coverRemove"
+            ref="album-upload"
+            :limit="1"
+            :file-list="fileList"
+          >
+            <div class="upload-btn">
+              <i class="el-icon-upload"></i>
+              <div class="el-upload__text">
+                将文件拖到此处，或
+                <em>点击上传</em>
+              </div>
+              <!-- <div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过500kb</div> -->
+            </div>
+          </el-upload>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="closeEdit">取 消</el-button>
@@ -177,6 +215,7 @@ export default {
   },
   data() {
     return {
+      keyword: "",
       fileList: [],
       activeIndex: "1",
       activeIndex2: "1",
@@ -266,6 +305,17 @@ export default {
           this.albumInit();
         });
     },
+    searchAlbum() {
+      fetch(this.url+"/search?keyword="+this.keyword, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }
+      })
+        .then(res => res.json())
+        .then(bks => {
+          window.console.log(bks);
+          this.albums = bks;
+        });
+    },
     showAdd() {
       this.albumInit();
       this.addVisible = true;
@@ -273,6 +323,7 @@ export default {
     showEdit(album) {
       this.editVisible = true;
       this.album = _.cloneDeep(album);
+      this.fileList = [{ name: "专辑封面", url: this.album.cover }];
     },
     deleteAlbum(album) {
       fetch(this.url + "/" + album._id, { method: "DELETE" })
@@ -324,6 +375,15 @@ export default {
       width: 70%;
       margin: 0 auto;
     }
+    .search-box {
+      position: absolute;
+      top: 10px;
+      right: 100px;
+      .search-input {
+        width: 180px;
+        margin-right: 5px;
+      }
+    }
   }
   .top-title {
     color: #fff;
@@ -335,6 +395,9 @@ export default {
   .list {
     width: 70%;
     margin: 0 auto;
+    .album-cover {
+      width: 100px;
+    }
   }
   .operate-box {
     width: 70%;
