@@ -26,9 +26,9 @@
           v-model="keyword"
           placeholder="请输入内容"
           prefix-icon="el-icon-search"
-          @keyup.enter.native="searchAlbum"
+          @keyup.enter.native="searchList"
         ></el-input>
-        <el-button type="primary" @click="searchAlbum">搜索</el-button>
+        <el-button type="primary" @click="searchList">搜索</el-button>
       </div>
     </div>
     <div class="operate-box">
@@ -203,6 +203,16 @@
         <el-button type="primary" @click="editAlbum">确 定</el-button>
       </div>
     </el-dialog>
+
+    <el-pagination
+      class="pagination-box"
+      background
+      layout="prev, pager, next"
+      :total="total"
+      :page-size="pageSize"
+      :current-page.sync="pageNum"
+      @current-change="handleCurrentChange"
+    ></el-pagination>
   </div>
 </template>
 
@@ -216,6 +226,9 @@ export default {
   data() {
     return {
       keyword: "",
+      pageSize: 5,
+      pageNum: 1,
+      total: 0,
       fileList: [],
       activeIndex: "1",
       activeIndex2: "1",
@@ -236,6 +249,24 @@ export default {
     };
   },
   methods: {
+    showMsg(type, msg) {
+      type = type || "success";
+      msg = msg || "success";
+      this.$message({
+        duration: 2000,
+        showClose: true,
+        message: msg,
+        type: type
+      });
+    },
+    searchList() {
+      this.pageNum = 1;
+      this.getList();
+    },
+    handleCurrentChange(pageNum) {
+      this.pageNum = pageNum;
+      this.getList();
+    },
     clearFiles() {
       this.$refs["album-upload"].clearFiles();
     },
@@ -279,14 +310,6 @@ export default {
       this.detailVisible = true;
       this.albumDetail = _.cloneDeep(album);
     },
-    getList() {
-      fetch(this.url, { type: "GET" })
-        .then(res => res.json())
-        .then(bks => {
-          this.albums = bks;
-          window.console.log(this.albums);
-        });
-    },
     closeEdit() {
       this.albumInit();
       this.editVisible = false;
@@ -299,21 +322,38 @@ export default {
         body: JSON.stringify(this.album)
       })
         .then(res => res.json())
-        .then(nb => {
-          window.console.log(nb);
-          this.getList();
-          this.albumInit();
+        .then(data => {
+          window.console.log(data);
+          if (data.code === 0) {
+            this.showMsg("success", data.msg);
+            this.getList();
+            this.albumInit();
+          } else {
+            this.showMsg("error", data.msg);
+          }
         });
     },
-    searchAlbum() {
-      fetch(this.url+"/search?keyword="+this.keyword, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" }
-      })
+    getList() {
+      fetch(
+        this.url +
+          "?keyword=" +
+          this.keyword +
+          "&pageSize=" +
+          this.pageSize +
+          "&pageNum=" +
+          this.pageNum,
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" }
+        }
+      )
         .then(res => res.json())
-        .then(bks => {
-          window.console.log(bks);
-          this.albums = bks;
+        .then(data => {
+          window.console.log(data);
+          if (data.code === 0) {
+            this.albums = data.list;
+            this.total = data.total;
+          }
         });
     },
     showAdd() {
@@ -328,9 +368,15 @@ export default {
     deleteAlbum(album) {
       fetch(this.url + "/" + album._id, { method: "DELETE" })
         .then(res => res.json())
-        .then(() => {
-          let index = this.albums.findIndex(item => item._id == album._id);
-          this.albums.splice(index, 1);
+        .then(data => {
+          if (data.code === 0) {
+            this.showMsg("success", data.msg);
+            this.getList();
+          } else {
+            this.showMsg("error", data.msg);
+          }
+          // let index = this.albums.findIndex(item => item._id == album._id);
+          // this.albums.splice(index, 1);
         });
     },
     addAlbum() {
@@ -340,12 +386,19 @@ export default {
         body: JSON.stringify(this.album)
       })
         .then(res => res.json())
-        .then(nb => {
-          this.albumInit();
-          this.albums.push(nb);
-          this.addVisible = false;
-          // 清掉上传的图片
-          this.clearFiles();
+        .then(data => {
+          if (data.code === 0) {
+            this.showMsg("success", data.msg);
+            this.albumInit();
+            // this.albums.push(nb);
+            this.pageNum = 1;
+            this.getList();
+            this.addVisible = false;
+            // 清掉上传的图片
+            this.clearFiles();
+          } else {
+            this.showMsg("error", data.msg);
+          }
         });
     },
     albumInit() {
@@ -458,6 +511,11 @@ export default {
       margin-right: 10px;
       vertical-align: bottom;
     }
+  }
+  .pagination-box {
+    width: 70%;
+    margin: 10px auto;
+    text-align: center;
   }
 }
 </style>
