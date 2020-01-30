@@ -1,41 +1,13 @@
 <template>
-  <div class="music-wrap">
-    <div class="top-nav">
-      <!-- <h2 class="title">新华音乐管理平台</h2> -->
-      <el-menu
-        :default-active="activeIndex2"
-        class="el-menu"
-        mode="horizontal"
-        background-color="#545c64"
-        text-color="#fff"
-        active-text-color="#ffd04b"
-      >
-        <el-menu-item class="top-title">新华音乐管理平台</el-menu-item>
-        <el-menu-item index="1">专辑管理</el-menu-item>
-        <el-menu-item index="2">歌手管理</el-menu-item>
-        <el-submenu index="3">
-          <template slot="title">我的</template>
-          <el-menu-item index="2-1">修改密码</el-menu-item>
-          <el-menu-item index="2-2" @click="exit">退出</el-menu-item>
-        </el-submenu>
-      </el-menu>
-
-      <div class="search-box">
-        <el-input
-          class="search-input"
-          v-model="keyword"
-          placeholder="请输入内容"
-          prefix-icon="el-icon-search"
-          @keyup.enter.native="searchList"
-        ></el-input>
-        <el-button type="primary" @click="searchList">搜索</el-button>
-      </div>
-    </div>
+  <div class="album-wrap">
+    <!-- 搜索 -->
+    <album-search type="album" @search="searchList"></album-search>
+    <!-- 操作（新增） -->
     <div class="operate-box">
       <el-button class="add-btn" type="primary" @click="showAdd">新增专辑</el-button>
     </div>
+    <!-- 列表 -->
     <el-table :data="albums" class="list">
-      <!-- <el-table-column prop="album_id" label="album_id" width="180"></el-table-column> -->
       <el-table-column prop="album_name" label="专辑名" width="200"></el-table-column>
       <el-table-column prop="price" label="价格"></el-table-column>
       <el-table-column prop="singers" label="歌手名">
@@ -51,7 +23,7 @@
       </el-table-column>
       <el-table-column fixed="right" label="操作">
         <template slot-scope="scope">
-          <el-button @click="showAlbumDetail(scope.row)" type="text" size="small">详情</el-button>
+          <el-button @click="showDetail(scope.row)" type="text" size="small">详情</el-button>
           <el-button @click="showEdit(scope.row)" type="text" size="small">编辑</el-button>
           <el-button @click="deleteAlbum(scope.row)" type="text" size="small">删除</el-button>
         </template>
@@ -64,23 +36,23 @@
       <div class="detailBox">
         <p>
           <span class="detail-desc">专辑名称：</span>
-          <span>{{albumDetail.album_name}}</span>
+          <span>{{album.album_name}}</span>
         </p>
         <p>
           <span class="detail-desc">价格：</span>
-          <span>{{albumDetail.price}}</span>
+          <span>{{album.price}}</span>
         </p>
         <div>
           <span class="detail-desc">歌手：</span>
           <el-tag
             class="singer-tag"
-            v-for="(item, index) in albumDetail.singers"
+            v-for="(item, index) in album.singers"
             :key="index"
           >{{item.singer_name}}</el-tag>
         </div>
         <div class="cover-box">
           <span class="detail-desc">封面图：</span>
-          <img :src="albumDetail.cover" />
+          <img :src="album.cover" />
         </div>
         <div slot="footer" class="dialog-footer">
           <el-button @click="detailVisible = false">取 消</el-button>
@@ -104,7 +76,6 @@
             :key="index"
             v-for="(item, index) in album.singers"
             closable
-            size="small"
             :disable-transitions="false"
             @close="tagClose(item)"
           >{{item.singer_name}}</el-tag>
@@ -113,10 +84,11 @@
             v-if="inputVisible"
             v-model="inputValue"
             ref="saveTagInput"
-            @keyup.enter.native="handleInputConfirm"
-            @blur="handleInputConfirm"
+            size="small"
+            @keyup.enter.native="addSinger"
+            @blur="addSinger"
           ></el-input>
-          <el-button class="button-new-tag" size="small" @click="showAddSinger">+ 歌手</el-button>
+          <el-button v-else class="button-new-tag" size="small" @click="showSingerInput">+ 歌手</el-button>
         </el-form-item>
         <el-form-item label="专辑封面">
           <el-upload
@@ -125,7 +97,7 @@
             :action="uploadUrl"
             list-type="picture"
             :on-success="uploadSussess"
-            :on-remove="coverRemove"
+            :on-remove="clearFiles"
             ref="album-upload"
             :limit="1"
           >
@@ -135,7 +107,6 @@
                 将文件拖到此处，或
                 <em>点击上传</em>
               </div>
-              <!-- <div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过500kb</div> -->
             </div>
           </el-upload>
         </el-form-item>
@@ -161,7 +132,6 @@
             :key="index"
             v-for="(item, index) in album.singers"
             closable
-            size="small"
             :disable-transitions="false"
             @close="tagClose(item)"
           >{{item.singer_name}}</el-tag>
@@ -170,10 +140,10 @@
             v-if="inputVisible"
             v-model="inputValue"
             ref="saveTagInput"
-            @keyup.enter.native="handleInputConfirm"
-            @blur="handleInputConfirm"
+            @keyup.enter.native="addSinger"
+            @blur="addSinger"
           ></el-input>
-          <el-button class="button-new-tag" size="small" @click="showAddSinger">+ 歌手</el-button>
+          <el-button v-else class="button-new-tag" size="small" @click="showSingerInput">+ 歌手</el-button>
         </el-form-item>
         <el-form-item label="专辑封面">
           <el-upload
@@ -182,7 +152,7 @@
             :action="uploadUrl"
             list-type="picture"
             :on-success="uploadSussess"
-            :on-remove="coverRemove"
+            :on-remove="clearFiles"
             ref="album-upload"
             :limit="1"
             :file-list="fileList"
@@ -204,6 +174,7 @@
       </div>
     </el-dialog>
 
+    <!-- 分页 -->
     <el-pagination
       class="pagination-box"
       background
@@ -218,167 +189,39 @@
 
 <script>
 import _ from "lodash";
+import AlbumSearch from "./Search";
+
 export default {
-  name: "Music",
+  name: "Album",
+  components: {
+    AlbumSearch
+  },
   created() {
     this.getList();
   },
   data() {
     return {
-      keyword: "",
+      searchVal: "",
       pageSize: 5,
       pageNum: 1,
       total: 0,
       fileList: [],
-      activeIndex: "1",
-      activeIndex2: "1",
       url: "http://localhost:3000/albums",
       uploadUrl: "http://localhost:3000/upload/album",
-      maxId: 2,
       album: { album_name: "", price: "", cover: "", singers: [] },
       addVisible: false,
       editVisible: false,
       detailVisible: false,
-      singerVisible: false,
-      uploadStatus: true,
-      chooseAlbum: {},
-      albumDetail: {},
       albums: [],
       inputVisible: false,
       inputValue: ""
     };
   },
   methods: {
-    showMsg(type, msg) {
-      type = type || "success";
-      msg = msg || "success";
-      this.$message({
-        duration: 2000,
-        showClose: true,
-        message: msg,
-        type: type
-      });
+    albumInit() {
+      this.album = { album_name: "", price: "", cover: "", singers: [] };
     },
-    searchList() {
-      this.pageNum = 1;
-      this.getList();
-    },
-    handleCurrentChange(pageNum) {
-      this.pageNum = pageNum;
-      this.getList();
-    },
-    clearFiles() {
-      this.$refs["album-upload"].clearFiles();
-    },
-    coverRemove(file, fileList) {
-      window.console.log(file, fileList);
-      this.clearFiles();
-      this.uploadStatus = true;
-    },
-    uploadSussess(response) {
-      if (response.status === 0) {
-        this.album.cover = response.data.url;
-        this.uploadStatus = false;
-      }
-    },
-    tagClose(singer) {
-      var index = this.album.singers.findIndex(
-        item => item.singer_name == singer.singer_name
-      );
-      this.album.singers.splice(index, 1);
-    },
-    showAddSinger() {
-      this.inputVisible = true;
-      this.$nextTick(() => {
-        this.$refs.saveTagInput.$refs.input.focus();
-      });
-    },
-    handleInputConfirm() {
-      let inputValue = this.inputValue;
-      if (inputValue) {
-        this.album.singers.push({
-          singer_name: inputValue
-        });
-      }
-      this.inputVisible = false;
-      this.inputValue = "";
-    },
-    addSinger() {
-      this.singerVisible = true;
-    },
-    showAlbumDetail(album) {
-      this.detailVisible = true;
-      this.albumDetail = _.cloneDeep(album);
-    },
-    closeEdit() {
-      this.albumInit();
-      this.editVisible = false;
-    },
-    editAlbum() {
-      this.editVisible = false;
-      fetch(this.url, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(this.album)
-      })
-        .then(res => res.json())
-        .then(data => {
-          window.console.log(data);
-          if (data.code === 0) {
-            this.showMsg("success", data.msg);
-            this.getList();
-            this.albumInit();
-          } else {
-            this.showMsg("error", data.msg);
-          }
-        });
-    },
-    getList() {
-      fetch(
-        this.url +
-          "?keyword=" +
-          this.keyword +
-          "&pageSize=" +
-          this.pageSize +
-          "&pageNum=" +
-          this.pageNum,
-        {
-          method: "GET",
-          headers: { "Content-Type": "application/json" }
-        }
-      )
-        .then(res => res.json())
-        .then(data => {
-          window.console.log(data);
-          if (data.code === 0) {
-            this.albums = data.list;
-            this.total = data.total;
-          }
-        });
-    },
-    showAdd() {
-      this.albumInit();
-      this.addVisible = true;
-    },
-    showEdit(album) {
-      this.editVisible = true;
-      this.album = _.cloneDeep(album);
-      this.fileList = [{ name: "专辑封面", url: this.album.cover }];
-    },
-    deleteAlbum(album) {
-      fetch(this.url + "/" + album._id, { method: "DELETE" })
-        .then(res => res.json())
-        .then(data => {
-          if (data.code === 0) {
-            this.showMsg("success", data.msg);
-            this.getList();
-          } else {
-            this.showMsg("error", data.msg);
-          }
-          // let index = this.albums.findIndex(item => item._id == album._id);
-          // this.albums.splice(index, 1);
-        });
-    },
+    // 新增
     addAlbum() {
       fetch(this.url, {
         method: "POST",
@@ -401,15 +244,137 @@ export default {
           }
         });
     },
-    albumInit() {
-      this.uploadStatus = true;
-      this.album = { album_name: "", price: "", cover: "", singers: [] };
+    // 删除
+    deleteAlbum(album) {
+      fetch(this.url + "/" + album._id, { method: "DELETE" })
+        .then(res => res.json())
+        .then(data => {
+          if (data.code === 0) {
+            this.showMsg("success", data.msg);
+            this.getList();
+          } else {
+            this.showMsg("error", data.msg);
+          }
+        });
     },
-    exit() {
-      let flag = false;
-      this.$store.commit("login", flag);
-      this.$router.push("/login");
-      window.console.log("退出登录");
+    // 编辑
+    editAlbum() {
+      this.editVisible = false;
+      fetch(this.url, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(this.album)
+      })
+        .then(res => res.json())
+        .then(data => {
+          window.console.log(data);
+          if (data.code === 0) {
+            this.showMsg("success", data.msg);
+            this.getList();
+            this.albumInit();
+          } else {
+            this.showMsg("error", data.msg);
+          }
+        });
+    },
+    // 查询
+    getList() {
+      fetch(
+        this.url +
+          "?keyword=" +
+          this.searchVal +
+          "&pageSize=" +
+          this.pageSize +
+          "&pageNum=" +
+          this.pageNum,
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" }
+        }
+      )
+        .then(res => res.json())
+        .then(data => {
+          window.console.log(data);
+          if (data.code === 0) {
+            this.albums = data.list;
+            this.total = data.total;
+          }
+        });
+    },
+    // 显示成功失败的消息
+    showMsg(type, msg) {
+      type = type || "success";
+      msg = msg || "success";
+      this.$message({
+        duration: 2000,
+        showClose: true,
+        message: msg,
+        type: type
+      });
+    },
+    // 搜索
+    searchList(keyword) {
+      this.searchVal = keyword;
+      this.pageNum = 1;
+      this.getList();
+    },
+    // 分页点击切换
+    handleCurrentChange(pageNum) {
+      this.pageNum = pageNum;
+      this.getList();
+    },
+    // 清空已上传的文件列表
+    clearFiles(file, fileList) {
+      window.console.log(file, fileList);
+      this.$refs["album-upload"].clearFiles();
+    },
+    // 上传成功
+    uploadSussess(response) {
+      if (response.status === 0) {
+        this.album.cover = response.data.url;
+      }
+    },
+    // 删除歌手标签
+    tagClose(singer) {
+      var index = this.album.singers.findIndex(
+        item => item.singer_name == singer.singer_name
+      );
+      this.album.singers.splice(index, 1);
+    },
+    // 新增歌手输入拦
+    showSingerInput() {
+      this.inputVisible = true;
+      this.$nextTick(() => {
+        this.$refs.saveTagInput.$refs.input.focus();
+      });
+    },
+    // 新增歌手
+    addSinger() {
+      let inputValue = this.inputValue;
+      if (inputValue) {
+        this.album.singers.push({
+          singer_name: inputValue
+        });
+      }
+      this.inputVisible = false;
+      this.inputValue = "";
+    },
+    showAdd() {
+      this.albumInit();
+      this.addVisible = true;
+    },
+    showEdit(album) {
+      this.editVisible = true;
+      this.album = _.cloneDeep(album);
+      this.fileList = [{ name: "专辑封面", url: this.album.cover }];
+    },
+    showDetail(album) {
+      this.detailVisible = true;
+      this.album = _.cloneDeep(album);
+    },
+    closeEdit() {
+      this.albumInit();
+      this.editVisible = false;
     }
   },
   computed: {
@@ -421,30 +386,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.music-wrap {
-  .top-nav {
-    background-color: rgb(84, 92, 100);
-    .el-menu {
-      width: 70%;
-      margin: 0 auto;
-    }
-    .search-box {
-      position: absolute;
-      top: 10px;
-      right: 100px;
-      .search-input {
-        width: 180px;
-        margin-right: 5px;
-      }
-    }
-  }
-  .top-title {
-    color: #fff;
-    font-size: 18px;
-    &:hover {
-      background-color: rgb(84, 92, 100) !important;
-    }
-  }
+.album-wrap {
   .list {
     width: 70%;
     margin: 0 auto;
@@ -498,7 +440,7 @@ export default {
       margin-right: 10px;
     }
     .el-tag + .el-tag {
-      margin: 0 10px;
+      margin-right: 10px;
     }
     .button-new-tag {
       height: 32px;
