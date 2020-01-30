@@ -62,7 +62,7 @@
     </el-dialog>
 
     <!-- 新增 -->
-    <el-dialog :visible.sync="addVisible" width="40%">
+    <el-dialog :before-close="closeAdd" :visible.sync="addVisible" width="40%">
       <h3 class="dialog-title">新增专辑</h3>
       <el-form label-width="100px" :model="album" class="add-form">
         <el-form-item label="专辑名称">
@@ -79,15 +79,16 @@
             :disable-transitions="false"
             @close="tagClose(item)"
           >{{item.singer_name}}</el-tag>
-          <el-input
+          <el-autocomplete
             class="input-new-tag"
-            v-if="inputVisible"
-            v-model="inputValue"
             ref="saveTagInput"
             size="small"
-            @keyup.enter.native="addSinger"
-            @blur="addSinger"
-          ></el-input>
+            v-if="singerInputFlag"
+            v-model="singerInput"
+            :fetch-suggestions="querySearchAsync"
+            placeholder="请输入歌手"
+            @select="addSinger"
+          ></el-autocomplete>
           <el-button v-else class="button-new-tag" size="small" @click="showSingerInput">+ 歌手</el-button>
         </el-form-item>
         <el-form-item label="专辑封面">
@@ -112,13 +113,13 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="addVisible = false">取 消</el-button>
+        <el-button @click="closeAdd">取 消</el-button>
         <el-button type="primary" @click="addAlbum">确 定</el-button>
       </div>
     </el-dialog>
 
     <!-- 修改 -->
-    <el-dialog :visible.sync="editVisible" width="40%">
+    <el-dialog :before-close="closeEdit" :visible.sync="editVisible" width="40%">
       <h3 class="dialog-title">修改信息</h3>
       <el-form label-width="100px" :model="album">
         <el-form-item label="专辑名称">
@@ -135,14 +136,16 @@
             :disable-transitions="false"
             @close="tagClose(item)"
           >{{item.singer_name}}</el-tag>
-          <el-input
+          <el-autocomplete
             class="input-new-tag"
-            v-if="inputVisible"
-            v-model="inputValue"
             ref="saveTagInput"
-            @keyup.enter.native="addSinger"
-            @blur="addSinger"
-          ></el-input>
+            size="small"
+            v-if="singerInputFlag"
+            v-model="singerInput"
+            :fetch-suggestions="querySearchAsync"
+            placeholder="请输入歌手"
+            @select="addSinger"
+          ></el-autocomplete>
           <el-button v-else class="button-new-tag" size="small" @click="showSingerInput">+ 歌手</el-button>
         </el-form-item>
         <el-form-item label="专辑封面">
@@ -163,7 +166,6 @@
                 将文件拖到此处，或
                 <em>点击上传</em>
               </div>
-              <!-- <div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过500kb</div> -->
             </div>
           </el-upload>
         </el-form-item>
@@ -198,6 +200,7 @@ export default {
   },
   created() {
     this.getList();
+    this.getSingers();
   },
   data() {
     return {
@@ -208,16 +211,57 @@ export default {
       fileList: [],
       url: "http://localhost:3000/albums",
       uploadUrl: "http://localhost:3000/upload/album",
+      singerUrl: "http://localhost:3000/singers",
       album: { album_name: "", price: "", cover: "", singers: [] },
       addVisible: false,
       editVisible: false,
       detailVisible: false,
       albums: [],
-      inputVisible: false,
-      inputValue: ""
+      singers: [],
+      singerInputFlag: false,
+      singerInput: "",
+      timeout: null
     };
   },
   methods: {
+    // Autocomplete
+    querySearchAsync(queryString, cb) {
+      var singers = this.singers;
+      var results = queryString
+        ? singers.filter(this.createFilter(queryString))
+        : singers;
+
+      clearTimeout(this.timeout);
+      this.timeout = setTimeout(() => {
+        cb(results);
+      }, 1000 * Math.random());
+    },
+    // Autocomplete过滤
+    createFilter(queryString) {
+      window.console.log(queryString);
+      return singerInput => {
+        return (
+          singerInput.value.toLowerCase().indexOf(queryString.toLowerCase()) ===
+          0
+        );
+      };
+    },
+    // 新增歌手输入拦
+    showSingerInput() {
+      this.singerInputFlag = true;
+      this.$nextTick(() => {
+        this.$refs.saveTagInput.$refs.input.focus();
+      });
+    },
+    // 新增歌手
+    addSinger(item) {
+      this.album.singers.push({
+        singer_name: item.value,
+        singer_id: item._id
+      });
+      this.singerInputFlag = false;
+      this.singerInput = "";
+    },
     albumInit() {
       this.album = { album_name: "", price: "", cover: "", singers: [] };
     },
@@ -301,6 +345,21 @@ export default {
           }
         });
     },
+    // 获取所有歌手
+    getSingers() {
+      fetch(this.singerUrl + "/all", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }
+      })
+        .then(res => res.json())
+        .then(data => {
+          window.console.log(data);
+          if (data.code === 0) {
+            this.singers = data.list;
+            window.console.log(this.singers);
+          }
+        });
+    },
     // 显示成功失败的消息
     showMsg(type, msg) {
       type = type || "success";
@@ -341,40 +400,32 @@ export default {
       );
       this.album.singers.splice(index, 1);
     },
-    // 新增歌手输入拦
-    showSingerInput() {
-      this.inputVisible = true;
-      this.$nextTick(() => {
-        this.$refs.saveTagInput.$refs.input.focus();
-      });
-    },
-    // 新增歌手
-    addSinger() {
-      let inputValue = this.inputValue;
-      if (inputValue) {
-        this.album.singers.push({
-          singer_name: inputValue
-        });
-      }
-      this.inputVisible = false;
-      this.inputValue = "";
-    },
     showAdd() {
       this.albumInit();
       this.addVisible = true;
     },
-    showEdit(album) {
-      this.editVisible = true;
-      this.album = _.cloneDeep(album);
-      this.fileList = [{ name: "专辑封面", url: this.album.cover }];
+    closeAdd() {
+      this.albumInit();
+      this.addVisible = false;
+      // 清掉上传的图片
+      this.clearFiles();
     },
-    showDetail(album) {
-      this.detailVisible = true;
+    showEdit(album) {
       this.album = _.cloneDeep(album);
+      this.fileList = this.album.cover
+        ? [{ name: "专辑封面", url: this.album.cover }]
+        : [];
+      this.editVisible = true;
     },
     closeEdit() {
       this.albumInit();
       this.editVisible = false;
+      // 清掉上传的图片
+      this.clearFiles();
+    },
+    showDetail(album) {
+      this.detailVisible = true;
+      this.album = _.cloneDeep(album);
     }
   },
   computed: {
@@ -449,7 +500,7 @@ export default {
       padding-bottom: 0;
     }
     .input-new-tag {
-      width: 90px;
+      min-width: 60px;
       margin-right: 10px;
       vertical-align: bottom;
     }
