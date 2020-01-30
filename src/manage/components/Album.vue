@@ -64,8 +64,8 @@
     <!-- 新增 -->
     <el-dialog :before-close="closeAdd" :visible.sync="addVisible" width="40%">
       <h3 class="dialog-title">新增专辑</h3>
-      <el-form label-width="100px" :model="album" class="add-form">
-        <el-form-item label="专辑名称">
+      <el-form ref="addForm" :rules="rules" label-width="100px" :model="album" class="add-form">
+        <el-form-item label="专辑名称" prop="album_name">
           <el-input v-model="album.album_name" placeholder="请输入专辑名"></el-input>
         </el-form-item>
         <el-form-item label="专辑价格">
@@ -86,7 +86,7 @@
             v-if="singerInputFlag"
             v-model="singerInput"
             :fetch-suggestions="querySearchAsync"
-            placeholder="请输入歌手"
+            placeholder="请选择歌手"
             @select="addSinger"
           ></el-autocomplete>
           <el-button v-else class="button-new-tag" size="small" @click="showSingerInput">+ 歌手</el-button>
@@ -121,8 +121,8 @@
     <!-- 修改 -->
     <el-dialog :before-close="closeEdit" :visible.sync="editVisible" width="40%">
       <h3 class="dialog-title">修改信息</h3>
-      <el-form label-width="100px" :model="album">
-        <el-form-item label="专辑名称">
+      <el-form ref="editForm" :rules="rules" label-width="100px" :model="album">
+        <el-form-item label="专辑名称" prop="album_name">
           <el-input placeholder="请输入专辑名称" v-model="album.album_name"></el-input>
         </el-form-item>
         <el-form-item label="专辑价格">
@@ -143,7 +143,7 @@
             v-if="singerInputFlag"
             v-model="singerInput"
             :fetch-suggestions="querySearchAsync"
-            placeholder="请输入歌手"
+            placeholder="请选择歌手"
             @select="addSinger"
           ></el-autocomplete>
           <el-button v-else class="button-new-tag" size="small" @click="showSingerInput">+ 歌手</el-button>
@@ -204,6 +204,11 @@ export default {
   },
   data() {
     return {
+      rules: {
+        album_name: [
+          { required: true, message: "请输入专辑名称", trigger: "blur" }
+        ]
+      },
       searchVal: "",
       pageSize: 5,
       pageNum: 1,
@@ -267,26 +272,35 @@ export default {
     },
     // 新增
     addAlbum() {
-      fetch(this.url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(this.album)
-      })
-        .then(res => res.json())
-        .then(data => {
-          if (data.code === 0) {
-            this.showMsg("success", data.msg);
-            this.albumInit();
-            // this.albums.push(nb);
-            this.pageNum = 1;
-            this.getList();
-            this.addVisible = false;
-            // 清掉上传的图片
-            this.clearFiles();
-          } else {
-            this.showMsg("error", data.msg);
-          }
-        });
+      this.$refs["addForm"].validate(valid => {
+        if (valid) {
+          fetch(this.url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(this.album)
+          })
+            .then(res => res.json())
+            .then(data => {
+              if (data.code === 0) {
+                this.showMsg("success", data.msg);
+                this.albumInit();
+                // this.albums.push(nb);
+                this.pageNum = 1;
+                this.getList();
+                this.addVisible = false;
+                // 清掉上传的图片
+                this.clearFiles();
+              } else {
+                this.showMsg("error", data.msg);
+              }
+            });
+        } else {
+          return false;
+        }
+      });
+    },
+    resetForm(formName) {
+      this.$refs[formName].resetFields();
     },
     // 删除
     deleteAlbum(album) {
@@ -409,6 +423,7 @@ export default {
       this.addVisible = false;
       // 清掉上传的图片
       this.clearFiles();
+      this.resetForm("addForm");
     },
     showEdit(album) {
       this.album = _.cloneDeep(album);
@@ -422,6 +437,7 @@ export default {
       this.editVisible = false;
       // 清掉上传的图片
       this.clearFiles();
+      this.resetForm("editForm");
     },
     showDetail(album) {
       this.detailVisible = true;

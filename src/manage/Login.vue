@@ -13,9 +13,9 @@
     >
       <h3 class="title">用户登录</h3>
       <el-form-item prop="username">
-        <el-input type="text" v-model="inputUser.uname" auto-complete="off" placeholder="账号"></el-input>
+        <el-input type="text" v-model="inputUser.username" auto-complete="off" placeholder="账号"></el-input>
       </el-form-item>
-      <el-form-item prop="pwd">
+      <el-form-item prop="password">
         <el-input type="password" v-model="inputUser.password" auto-complete="off" placeholder="密码"></el-input>
       </el-form-item>
       <el-form-item style="width:100%;">
@@ -35,7 +35,7 @@ export default {
       inputUser: {},
       errorMsg: "",
       rules: {
-        uname: [
+        username: [
           { required: true, message: "请输入账号", trigger: "blur" }
           //{ validator: validaePass }
         ],
@@ -50,11 +50,11 @@ export default {
   computed: {},
   methods: {
     login() {
-      // let uname = this.$refs.uname.value;
+      // let username = this.$refs.username.value;
       // let psd = this.$refs.password.value;
       let index = this.users.findIndex(
         item =>
-          item.uname === this.inputUser.uname &&
+          item.username === this.inputUser.username &&
           item.password == this.inputUser.password
       );
       if (index >= 0) {
@@ -71,11 +71,11 @@ export default {
     //   .then(us => (this.users = us));
     this.users = [
       {
-        uname: "tom",
+        username: "tom",
         password: 234
       },
       {
-        uname: "nie",
+        username: "nie",
         password: 123
       }
     ];
