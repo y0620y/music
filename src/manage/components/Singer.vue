@@ -365,7 +365,7 @@ export default {
     .singer-cover {
       width: 100px;
     }
-    .row-singer {
+    .row-album {
       margin-right: 10px;
     }
   }
