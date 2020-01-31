@@ -9,11 +9,24 @@
     <!-- 列表 -->
     <el-table :data="albums" class="list">
       <el-table-column prop="album_name" label="专辑名" width="200"></el-table-column>
-      <el-table-column prop="price" label="价格"></el-table-column>
+      <el-table-column prop="price" label="价格">
+        <template slot-scope="scope">
+          <span v-if="scope.row.price">{{ scope.row.price}}</span>
+          <span v-else>暂无</span>
+        </template>
+      </el-table-column>
       <el-table-column prop="singers" label="歌手名">
         <template slot-scope="scope">
-          <span>{{ scope.row.singers && scope.row.singers[0] && scope.row.singers[0].singer_name }}</span>
-          <span v-if="scope.row.singers.length>1">等人</span>
+          <div v-if="scope.row.singers.length">
+            <span
+              class="row-singer"
+              v-for="(item, index) in scope.row.singers"
+              :key="index"
+            >{{ item.singer_name }}</span>
+          </div>
+          <div v-else>
+            <span class="row-singer">未知歌手</span>
+          </div>
         </template>
       </el-table-column>
       <el-table-column prop="cover" label="封面图">
@@ -38,11 +51,11 @@
           <span class="detail-desc">专辑名称：</span>
           <span>{{album.album_name}}</span>
         </p>
-        <p>
+        <p v-if="album.price">
           <span class="detail-desc">价格：</span>
           <span>{{album.price}}</span>
         </p>
-        <div>
+        <div v-if="album.singers.length">
           <span class="detail-desc">歌手：</span>
           <el-tag
             class="singer-tag"
@@ -50,7 +63,7 @@
             :key="index"
           >{{item.singer_name}}</el-tag>
         </div>
-        <div class="cover-box">
+        <div class="cover-box" v-if="album.cover">
           <span class="detail-desc">封面图：</span>
           <img :src="album.cover" />
         </div>
@@ -194,7 +207,6 @@ import _ from "lodash";
 import AlbumSearch from "./Search";
 
 export default {
-  name: "Album",
   components: {
     AlbumSearch
   },
@@ -215,7 +227,7 @@ export default {
       total: 0,
       fileList: [],
       url: "http://localhost:3000/albums",
-      uploadUrl: "http://localhost:3000/upload/album",
+      uploadUrl: "http://localhost:3000/upload",
       singerUrl: "http://localhost:3000/singers",
       album: { album_name: "", price: "", cover: "", singers: [] },
       addVisible: false,
@@ -262,18 +274,31 @@ export default {
     addSinger(item) {
       this.album.singers.push({
         singer_name: item.value,
-        singer_id: item._id
+        _id: item._id
       });
       this.singerInputFlag = false;
       this.singerInput = "";
     },
+    // 初始化
     albumInit() {
       this.album = { album_name: "", price: "", cover: "", singers: [] };
+    },
+    // 处理singers_id
+    handleSingersId() {
+      var singersList = this.album.singers;
+      var ids = [];
+      if (singersList.length) {
+        singersList.forEach(element => {
+          ids.push(element._id);
+        });
+      }
+      this.album.singers_id = ids;
     },
     // 新增
     addAlbum() {
       this.$refs["addForm"].validate(valid => {
         if (valid) {
+          this.handleSingersId();
           fetch(this.url, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -304,20 +329,31 @@ export default {
     },
     // 删除
     deleteAlbum(album) {
-      fetch(this.url + "/" + album._id, { method: "DELETE" })
-        .then(res => res.json())
-        .then(data => {
-          if (data.code === 0) {
-            this.showMsg("success", data.msg);
-            this.getList();
-          } else {
-            this.showMsg("error", data.msg);
-          }
+      this.$confirm("确定删除该文件吗?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          fetch(this.url + "/" + album._id, { method: "DELETE" })
+            .then(res => res.json())
+            .then(data => {
+              if (data.code === 0) {
+                this.showMsg("success", data.msg);
+                this.getList();
+              } else {
+                this.showMsg("error", data.msg);
+              }
+            });
+        })
+        .catch(() => {
+          this.showMsg("info", "已取消删除");
         });
     },
     // 编辑
     editAlbum() {
       this.editVisible = false;
+      this.handleSingersId();
       fetch(this.url, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -403,7 +439,7 @@ export default {
     },
     // 上传成功
     uploadSussess(response) {
-      if (response.status === 0) {
+      if (response.code === 0) {
         this.album.cover = response.data.url;
       }
     },
@@ -443,11 +479,6 @@ export default {
       this.detailVisible = true;
       this.album = _.cloneDeep(album);
     }
-  },
-  computed: {
-    priceTotal() {
-      return this.albums.reduce((prev, album) => prev + album.price, 0);
-    }
   }
 };
 </script>
@@ -460,6 +491,9 @@ export default {
     .album-cover {
       width: 100px;
     }
+    .row-singer {
+      margin-right: 10px;
+    }
   }
   .operate-box {
     width: 70%;
@@ -470,7 +504,7 @@ export default {
       margin: 20px 0;
     }
   }
-
+  // 详情
   .detailBox {
     text-align: left;
     margin: 20px;
@@ -498,10 +532,12 @@ export default {
     margin-bottom: 20px;
     font-weight: bold;
     font-size: 16px;
+    text-align: center;
   }
   .dialog-footer {
     text-align: center;
   }
+  // 新增歌手
   .singers-box {
     .el-tag {
       margin-right: 10px;
@@ -521,6 +557,7 @@ export default {
       vertical-align: bottom;
     }
   }
+  // 分页
   .pagination-box {
     width: 70%;
     margin: 10px auto;
