@@ -3,7 +3,7 @@
     <el-input
       class="search-input"
       v-model="keyword"
-      :placeholder="this.placeholder"
+      :placeholder="this.des"
       prefix-icon="el-icon-search"
       @keyup.enter.native="handleSearch"
     ></el-input>
@@ -18,13 +18,25 @@ export default {
   },
   data() {
     return {
-      keyword: "",
-      placeholder: this.type == "album" ? "请输入专辑" : "请输入歌手"
+      keyword: ""
     };
   },
   methods: {
     handleSearch() {
       this.$emit("search", this.keyword);
+    }
+  },
+  computed: {
+    des() {
+      var text = "";
+      if (this.type === "album") {
+        text = "请输入专辑";
+      } else if (this.type === "user") {
+        text = "请输入用户";
+      } else {
+        text = "请输入歌手";
+      }
+      return text;
     }
   }
 };

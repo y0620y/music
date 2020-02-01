@@ -12,10 +12,10 @@
       <el-menu-item class="top-title">新华音乐管理平台</el-menu-item>
       <el-menu-item index="1">歌手管理</el-menu-item>
       <el-menu-item index="2">专辑管理</el-menu-item>
-      <el-submenu index="3">
+      <el-menu-item index="3">用户管理</el-menu-item>
+      <el-submenu index="4">
         <template slot="title">我的</template>
-        <el-menu-item index="3-1">修改密码</el-menu-item>
-        <el-menu-item index="3-2" @click="exit">退出</el-menu-item>
+        <el-menu-item index="4-1" @click="exit">退出</el-menu-item>
       </el-submenu>
     </el-menu>
   </div>

@@ -535,6 +535,7 @@ export default {
     text-align: center;
   }
   .dialog-footer {
+    margin: 10px;
     text-align: center;
   }
   // 新增歌手

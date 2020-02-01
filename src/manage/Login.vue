@@ -4,7 +4,7 @@
       <Header></Header>
     </el-header>
     <el-form
-      ref="AccountFrom"
+      ref="loginFrom"
       :model="inputUser"
       :rules="rules"
       label-position="left"
@@ -12,8 +12,8 @@
       class="demo-ruleForm login-container"
     >
       <h3 class="title">用户登录</h3>
-      <el-form-item prop="username">
-        <el-input type="text" v-model="inputUser.username" auto-complete="off" placeholder="账号"></el-input>
+      <el-form-item prop="name">
+        <el-input type="text" v-model="inputUser.name" auto-complete="off" placeholder="用户名"></el-input>
       </el-form-item>
       <el-form-item prop="password">
         <el-input type="password" v-model="inputUser.password" auto-complete="off" placeholder="密码"></el-input>
@@ -30,55 +30,58 @@ export default {
   data() {
     return {
       url: "http://localhost:3000/users",
-      currentUser: null,
-      users: [],
       inputUser: {},
-      errorMsg: "",
       rules: {
-        username: [
-          { required: true, message: "请输入账号", trigger: "blur" }
-          //{ validator: validaePass }
+        name: [
+          { required: true, message: "请输入用户名", trigger: "blur" },
+          { min: 2, max: 12, message: "长度在 2 到 12 个字符", trigger: "blur" }
         ],
         password: [
-          { required: true, message: "请输入密码", trigger: "blur" }
-          //{ validator: validaePass2 }
+          { required: true, message: "请输入密码", trigger: "blur" },
+          {
+            pattern: /^(\w){6,12}$/,
+            message: "密码由6-12个数字、字母、下划线组成"
+          }
         ]
       }
     };
   },
-  props: {},
-  computed: {},
   methods: {
+    // 显示成功失败的消息
+    showMsg(type, msg) {
+      type = type || "success";
+      msg = msg || "success";
+      this.$message({
+        duration: 2000,
+        showClose: true,
+        message: msg,
+        type: type
+      });
+    },
     login() {
-      // let username = this.$refs.username.value;
-      // let psd = this.$refs.password.value;
-      let index = this.users.findIndex(
-        item =>
-          item.username === this.inputUser.username &&
-          item.password == this.inputUser.password
-      );
-      if (index >= 0) {
-        let flag = true;
-        this.$store.commit("login", flag);
-        this.$router.push("/home");
-        window.console.log("登录成功");
-      }
+      this.$refs["loginFrom"].validate(valid => {
+        if (valid) {
+          fetch(this.url + "/login/admin", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(this.inputUser)
+          })
+            .then(res => res.json())
+            .then(data => {
+              if (data.code === 0) {
+                let flag = true;
+                this.$store.commit("login", flag);
+                this.$router.push("/home");
+                window.console.log("登录成功");
+              } else {
+                this.showMsg("error", data.msg);
+              }
+            });
+        } else {
+          return false;
+        }
+      });
     }
-  },
-  created() {
-    // fetch(this.url, { type: "GET" })
-    //   .then(res => res.json())
-    //   .then(us => (this.users = us));
-    this.users = [
-      {
-        username: "tom",
-        password: 234
-      },
-      {
-        username: "nie",
-        password: 123
-      }
-    ];
   }
 };
 </script>
