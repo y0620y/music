@@ -1,7 +1,6 @@
 <template>
   <div class="album-wrap">
-    <!-- 搜索 -->
-    <album-search type="album" @search="searchList"></album-search>
+    <top-header></top-header>
 
     <ul class="album-list">
       <router-link
@@ -34,11 +33,11 @@
 </template>
 
 <script>
-import AlbumSearch from "./Search";
+import TopHeader from "./Header";
 
 export default {
   components: {
-    AlbumSearch
+    TopHeader
   },
   created() {
     this.getList();
@@ -79,11 +78,11 @@ export default {
         });
     },
     // 搜索
-    searchList(keyword) {
-      this.searchVal = keyword;
-      this.pageNum = 1;
-      this.getList();
-    },
+    // searchList(keyword) {
+    //   this.searchVal = keyword;
+    //   this.pageNum = 1;
+    //   this.getList();
+    // },
     // 分页点击切换
     handleCurrentChange(pageNum) {
       this.pageNum = pageNum;

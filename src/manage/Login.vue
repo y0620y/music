@@ -34,7 +34,7 @@ export default {
       rules: {
         name: [
           { required: true, message: "请输入用户名", trigger: "blur" },
-          { min: 2, max: 12, message: "长度在 2 到 12 个字符", trigger: "blur" }
+          { min: 2, max: 10, message: "长度在 2 到 10 个字符", trigger: "blur" }
         ],
         password: [
           { required: true, message: "请输入密码", trigger: "blur" },
@@ -71,7 +71,7 @@ export default {
               if (data.code === 0) {
                 let flag = true;
                 this.$store.commit("login", flag);
-                this.$router.push("/home");
+                this.$router.push("/manage");
                 window.console.log("登录成功");
               } else {
                 this.showMsg("error", data.msg);

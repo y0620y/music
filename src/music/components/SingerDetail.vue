@@ -1,5 +1,6 @@
 <template>
   <div class="singer-wrap">
+    <top-header></top-header>
     <div class="img-wrap">
       <img :src="singer.cover " />
     </div>
@@ -10,7 +11,11 @@
 </template>
 
 <script>
+import TopHeader from "./Header";
 export default {
+  components: {
+    TopHeader
+  },
   created() {
     this.getItem();
   },

@@ -7,7 +7,7 @@
       prefix-icon="el-icon-search"
       @keyup.enter.native="handleSearch"
     ></el-input>
-    <el-button type="primary" @click="handleSearch">搜索</el-button>
+    <!-- <el-button type="primary" @click="handleSearch">搜索</el-button> -->
   </div>
 </template>
 
@@ -46,7 +46,7 @@ export default {
 .search-box {
   position: absolute;
   top: 10px;
-  right: 100px;
+  right: 250px;
   .search-input {
     width: 180px;
     margin-right: 5px;

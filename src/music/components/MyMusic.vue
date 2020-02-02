@@ -1,20 +1,19 @@
 <template>
-  <div class="singer-wrap">
-    <top-header></top-header>
-
-    <ul class="singer-list">
+  <div class="album-wrap">
+    <top-header></top-header>我的收藏
+    <ul class="album-list">
       <router-link
         tag="li"
         class="item border-bottom"
-        v-for="(item, index) in singers"
+        v-for="(item, index) in albums"
         :key="index"
-        :to="'/singer/' + item._id"
+        :to="'/album/' + item._id"
       >
         <div class="img-wrap">
-          <img :src="item.cover " />
+          <img :src="item.cover" />
         </div>
         <div class="item-info">
-          <span>{{item.singer_name}}</span>
+          <span>{{item.album_name}}</span>
         </div>
       </router-link>
     </ul>
@@ -48,32 +47,23 @@ export default {
       pageSize: 10,
       pageNum: 1,
       total: 0,
-      url: "http://localhost:3000/singers",
-      singers: []
+      url: "http://localhost:3000/users",
+      albums: []
     };
   },
   methods: {
     // 查询
     getList() {
-      fetch(
-        this.url +
-          "?keyword=" +
-          this.searchVal +
-          "&pageSize=" +
-          this.pageSize +
-          "&pageNum=" +
-          this.pageNum,
-        {
-          method: "GET",
-          headers: { "Content-Type": "application/json" }
-        }
-      )
+      fetch(this.url + "?keyword=" + this.$route.params.username, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }
+      })
         .then(res => res.json())
         .then(data => {
           window.console.log(data);
           if (data.code === 0) {
-            this.singers = data.list;
-            this.total = data.total;
+            this.albums = data.list[0] && data.list[0].albums;
+            window.console.log(this.albums);
           }
         });
     },
@@ -93,8 +83,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.singer-wrap {
-  .singer-list {
+.album-wrap {
+  .album-list {
     width: 900px;
     margin: 0 auto;
     padding: 40px;

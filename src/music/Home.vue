@@ -1,24 +1,16 @@
 <template>
   <div class="home">
-    <home-header @navselect="handleNav"></home-header>
-
-    <component :is="navActive"></component>
+    <home-header></home-header>首页
   </div>
 </template>
 
 <script>
 import HomeHeader from "./components/Header";
-import HomeAlbum from "./components/Album";
-import HomeSinger from "./components/Singer";
-import HomeHot from "./components/Hot";
 
 export default {
   name: "home",
   components: {
-    HomeHeader,
-    HomeAlbum,
-    HomeSinger,
-    HomeHot
+    HomeHeader
   },
   data() {
     return {
