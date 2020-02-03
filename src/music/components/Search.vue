@@ -1,13 +1,22 @@
 <template>
   <div class="search-box">
-    <el-input
+    <!-- <el-input
       class="search-input"
       v-model="keyword"
       placeholder="专辑/歌手"
       prefix-icon="el-icon-search"
       @keyup.enter.native="handleSearch"
-    ></el-input>
-    <el-button type="primary" @click="handleSearch">搜索</el-button>
+    ></el-input>-->
+
+    <el-autocomplete
+      class="search-input"
+      v-model="searchInput"
+      :fetch-suggestions="querySearchAsync"
+      placeholder="专辑/歌手"
+      @select="handleSelect"
+    ></el-autocomplete>
+
+    <el-button type="primary">搜索</el-button>
   </div>
 </template>
 
@@ -16,14 +25,56 @@ export default {
   props: {
     type: String
   },
+  created() {
+    this.getSingers();
+  },
   data() {
     return {
-      keyword: ""
+      singerUrl: "http://localhost:3000/singers",
+      keyword: "",
+      timeout: null,
+      singers: [],
+      searchInput: ""
     };
   },
   methods: {
-    handleSearch() {
-      this.$emit("search", this.keyword);
+    handleSelect() {},
+    // Autocomplete
+    querySearchAsync(queryString, cb) {
+      var singers = this.singers;
+      var results = queryString
+        ? singers.filter(this.createFilter(queryString))
+        : singers;
+
+      clearTimeout(this.timeout);
+      this.timeout = setTimeout(() => {
+        cb(results);
+      }, 1000 * Math.random());
+    },
+    // Autocomplete过滤
+    createFilter(queryString) {
+      window.console.log(queryString);
+      return searchInput => {
+        return (
+          searchInput.value.toLowerCase().indexOf(queryString.toLowerCase()) ===
+          0
+        );
+      };
+    },
+    // 获取所有歌手
+    getSingers() {
+      fetch(this.singerUrl + "/all", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }
+      })
+        .then(res => res.json())
+        .then(data => {
+          window.console.log(data);
+          if (data.code === 0) {
+            this.singers = data.list;
+            window.console.log(this.singers);
+          }
+        });
     }
   },
   computed: {}

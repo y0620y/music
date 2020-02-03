@@ -28,7 +28,7 @@ export default {
   methods: {
     // 查询
     getItem() {
-      fetch(this.url + "/" + this.$route.params.id, {
+      fetch(this.url + "/detail/" + this.$route.params.id, {
         method: "GET",
         headers: { "Content-Type": "application/json" }
       })

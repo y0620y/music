@@ -103,7 +103,7 @@ export default {
     },
     // 查询
     getItem() {
-      fetch(this.url + "/" + this.albumId, {
+      fetch(this.url + "/detail/" + this.albumId, {
         method: "GET",
         headers: { "Content-Type": "application/json" }
       })
