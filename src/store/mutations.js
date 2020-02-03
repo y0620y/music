@@ -1,8 +1,8 @@
 export default {
-  setUser(state, username) {
-    state.username = username
+  setUser(state, user) {
+    state.user = user
     try {
-      localStorage.username = username
+      localStorage.setItem('user', JSON.stringify(user));
     } catch (e) {
       window.console.log(e)
     }
@@ -10,7 +10,11 @@ export default {
   login: (state, n) => {
     //传入登录状态islogin
     let islogin = JSON.parse(n);
-    localStorage.setItem('islogin', JSON.stringify(islogin));
+    try {
+      localStorage.setItem('islogin', JSON.stringify(islogin));
+    } catch (e) {
+      window.console.log(e)
+    }
     window.console.log(islogin);
     state.islogin = islogin;
   }

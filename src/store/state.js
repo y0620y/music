@@ -1,14 +1,14 @@
-let username = ''
+var user = {}
 try {
-  if (localStorage.username) {
-    username = localStorage.username
+  if (localStorage.getItem('user')) {
+    user = JSON.parse(localStorage.getItem('user'))
   }
 } catch (e) {
   window.console.log(e)
 }
 
 export default {
-  username: username,
+  user: user,
   islogin: ''
 }
 

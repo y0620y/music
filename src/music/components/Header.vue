@@ -89,7 +89,12 @@ export default {
   },
   name: "Header",
   computed: {
-    ...mapState(["username"]),
+    ...mapState({
+      loginUser: "user"
+    }),
+    username() {
+      return this.loginUser && this.loginUser.name;
+    },
     myMusicLink() {
       return "/myMusic/" + this.username;
     }
@@ -140,7 +145,8 @@ export default {
                 // this.$router.push("/home");
                 this.showMsg("success", data.msg);
                 this.loginVisible = false;
-                this.setUser(this.user.name);
+                window.console.log(data.data);
+                this.setUser(data.data);
                 window.console.log("登录成功");
               } else {
                 this.showMsg("error", data.msg);
@@ -165,7 +171,8 @@ export default {
               if (data.code === 0) {
                 this.showMsg("success", data.msg);
                 this.addVisible = false;
-                this.setUser(this.user.name);
+                window.console.log(data.data);
+                this.setUser(data.data);
               } else {
                 this.showMsg("error", data.msg);
               }

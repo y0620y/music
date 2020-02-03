@@ -3,11 +3,11 @@
     <el-input
       class="search-input"
       v-model="keyword"
-      :placeholder="this.des"
+      placeholder="专辑/歌手"
       prefix-icon="el-icon-search"
       @keyup.enter.native="handleSearch"
     ></el-input>
-    <!-- <el-button type="primary" @click="handleSearch">搜索</el-button> -->
+    <el-button type="primary" @click="handleSearch">搜索</el-button>
   </div>
 </template>
 
@@ -26,19 +26,7 @@ export default {
       this.$emit("search", this.keyword);
     }
   },
-  computed: {
-    des() {
-      var text = "";
-      if (this.type === "album") {
-        text = "请输入专辑";
-      } else if (this.type === "user") {
-        text = "请输入用户";
-      } else {
-        text = "请输入歌手";
-      }
-      return text;
-    }
-  }
+  computed: {}
 };
 </script>
 
