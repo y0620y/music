@@ -9,6 +9,7 @@ import AlbumDetail from "../music/components/AlbumDetail"
 import Album from "../music/components/Album";
 import Singer from "../music/components/Singer";
 import MyMusic from "../music/components/MyMusic";
+import SearchPage from "../music/components/SearchPage";
 
 Vue.use(VueRouter)
 
@@ -53,6 +54,11 @@ const routes = [
     path: '/album/:id',
     name: 'adetail',
     component: AlbumDetail
+  },
+  {
+    path: '/search/:keyword',
+    name: 'searchPage',
+    component: SearchPage
   }
 ]
 const router = new VueRouter({
@@ -60,5 +66,13 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes
 })
+
+/**
+ * 重写路由的push方法
+ */
+const routerPush = VueRouter.prototype.push
+VueRouter.prototype.push = function push(location) {
+  return routerPush.call(this, location).catch(error => error)
+}
 
 export default router

@@ -32,7 +32,7 @@
           </div>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item>
-              <router-link :to="myMusicLink">我的收藏</router-link>
+              <router-link :to="'/myMusic/' + username">我的收藏</router-link>
             </el-dropdown-item>
             <el-dropdown-item @click.native="exit">退出</el-dropdown-item>
           </el-dropdown-menu>
@@ -94,9 +94,6 @@ export default {
     }),
     username() {
       return this.loginUser && this.loginUser.name;
-    },
-    myMusicLink() {
-      return "/myMusic/" + this.username;
     }
   },
   props: {
