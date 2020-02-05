@@ -77,12 +77,6 @@ export default {
           }
         });
     },
-    // 搜索
-    // searchList(keyword) {
-    //   this.searchVal = keyword;
-    //   this.pageNum = 1;
-    //   this.getList();
-    // },
     // 分页点击切换
     handleCurrentChange(pageNum) {
       this.pageNum = pageNum;
@@ -106,14 +100,21 @@ export default {
       margin: 10px 20px;
       line-height: 1.4;
       overflow: hidden;
+      cursor: pointer;
       .img-wrap {
+        border: 1px solid #d5d5d5;
         img {
+          display: block;
           width: 140px;
           height: 140px;
         }
       }
       .item-info {
+        width: 140px;
         margin: 8px 0 2px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
         font-size: 14px;
       }
     }

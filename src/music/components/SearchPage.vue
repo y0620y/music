@@ -43,24 +43,58 @@
     <el-tabs type="border-card" class="search-card">
       <el-tab-pane>
         <span slot="label">
-          <i class="el-icon-collection"></i> 专辑
+          <i class="el-icon-collection"></i>
+          专辑 ({{hasAlbumData}})
         </span>
         <div class="album-card">
-          <el-table :data="albumResult" stripe style="width: 100%">
-            <el-table-column prop="_id" label="Id" width="180"></el-table-column>
-            <el-table-column prop="value" label="专辑" width="180"></el-table-column>
-          </el-table>
+          <ul class="album-list" v-if="hasAlbumData">
+            <router-link
+              tag="li"
+              class="item border-bottom"
+              v-for="(item, index) in albumResult"
+              :key="index"
+              :to="'/album/' + item._id"
+            >
+              <div class="img-wrap">
+                <img :src="item.cover " />
+              </div>
+              <div class="item-info">
+                <span v-html="item.newValue"></span>
+              </div>
+            </router-link>
+          </ul>
+          <div class="no-data" v-else>
+            <i class="el-icon-s-promotion"></i>
+            很抱歉，未能找到相关专辑
+          </div>
         </div>
       </el-tab-pane>
       <el-tab-pane label="歌手">
         <span slot="label">
-          <i class="el-icon-user"></i>歌手
+          <i class="el-icon-user"></i>
+          歌手 ({{hasSingerData}})
         </span>
         <div class="singer-card">
-          <el-table :data="singerResult" stripe style="width: 100%">
-            <el-table-column prop="_id" label="Id" width="180"></el-table-column>
-            <el-table-column prop="value" label="歌手" width="180"></el-table-column>
-          </el-table>
+          <ul class="singer-list" v-if="hasSingerData">
+            <router-link
+              tag="li"
+              class="item border-bottom"
+              v-for="(item, index) in singerResult"
+              :key="index"
+              :to="'/singer/' + item._id"
+            >
+              <div class="img-wrap">
+                <img :src="item.cover " />
+              </div>
+              <div class="item-info">
+                <span v-html="item.newValue"></span>
+              </div>
+            </router-link>
+          </ul>
+          <div class="no-data" v-else>
+            <i class="el-icon-s-promotion"></i>
+            很抱歉，未能找到相关歌手
+          </div>
         </div>
       </el-tab-pane>
     </el-tabs>
@@ -269,10 +303,48 @@ export default {
   i {
     margin-right: 5px;
   }
+  .album-list,
+  .singer-list {
+    width: 900px;
+    margin: 0 auto;
+    padding: 40px;
+    overflow: hidden;
+    li {
+      float: left;
+      width: 140px;
+      height: 188px;
+      margin: 10px 20px;
+      line-height: 1.4;
+      overflow: hidden;
+      cursor: pointer;
+      .img-wrap {
+        border: 1px solid #d5d5d5;
+        img {
+          display: block;
+          width: 140px;
+          height: 140px;
+        }
+      }
+      .item-info {
+        width: 140px;
+        margin: 8px 0 2px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        font-size: 14px;
+      }
+    }
+  }
+  .no-data {
+    padding: 110px 0;
+    text-align: center;
+    font-size: 20px;
+    color: #666;
+  }
 }
 </style>
 <style>
-.search-box .search-text {
+.search-text {
   color: #25a4bb;
 }
 </style>

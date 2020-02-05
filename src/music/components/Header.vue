@@ -1,8 +1,10 @@
 <template>
   <div class="top-nav">
     <div class="nav-wrap">
-      <router-link to="/music">
-        <h3 class="top-title">简音乐</h3>
+      <router-link to="/music" class="top-title-wrap">
+        <div class="top-title">
+          <img class="top-logo" src="../../assets/image/logo.png" />简音乐
+        </div>
       </router-link>
       <el-menu
         :default-active="$route.path"
@@ -223,25 +225,32 @@ export default {
 </script>
 <style lang="scss" scoped>
 .top-nav {
-  .el-menu-item {
-    padding: 0 30px;
-  }
-  .top-title {
-    position: relative;
-    z-index: 3;
-    float: left;
-    width: 100px;
-    height: 60px;
-    line-height: 60px;
-    text-align: center;
-    color: #fff;
-    font-size: 18px;
-  }
   background-color: rgb(84, 92, 100);
   .nav-wrap {
     position: relative;
-    width: 920px;
+    width: 980px;
     margin: 0 auto;
+    .el-menu-item {
+      padding: 0 30px;
+    }
+    .top-title-wrap {
+      .top-title {
+        position: relative;
+        z-index: 3;
+        float: left;
+        width: 160px;
+        height: 60px;
+        line-height: 60px;
+        text-align: center;
+        color: #fff;
+        font-size: 22px;
+        .top-logo {
+          width: 40px;
+          height: 40px;
+          margin: -2px 2px 0 0;
+        }
+      }
+    }
     .login-wrap {
       position: absolute;
       top: 0;

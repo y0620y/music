@@ -2,12 +2,15 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
+import VueAwesomeSwiper from 'vue-awesome-swiper'
 import './assets/styles/reset.css'
+import 'swiper/dist/css/swiper.css'
 
 Vue.config.productionTip = false
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 Vue.use(ElementUI)
+Vue.use(VueAwesomeSwiper)
 new Vue({
   router,
   store,
@@ -20,11 +23,11 @@ router.beforeEach((to, from, next) => {
   window.console.log(to);
   window.console.log(from);
   if (to.meta.requireAuth) { // 判断该路由是否需要登录权限
-    if(JSON.parse(localStorage.getItem('islogin'))){ //判断本地是否存在access_token
+    if (JSON.parse(localStorage.getItem('islogin'))) { //判断本地是否存在access_token
       next();
-    }else {
+    } else {
       next({
-        path:'/login'
+        path: '/login'
       })
     }
   }
@@ -32,12 +35,12 @@ router.beforeEach((to, from, next) => {
     next();
   }
   /*如果本地 存在 token 则 不允许直接跳转到 登录页面*/
-  if(to.fullPath == "/login"){
-    if(JSON.parse(localStorage.getItem('islogin'))){
+  if (to.fullPath == "/login") {
+    if (JSON.parse(localStorage.getItem('islogin'))) {
       next({
-        path:from.fullPath
+        path: from.fullPath
       });
-    }else {
+    } else {
       next();
     }
   }
