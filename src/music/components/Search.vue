@@ -7,7 +7,6 @@
       prefix-icon="el-icon-search"
       @keyup.enter.native="handleSearch"
       @focus="handleFocus"
-      @blur="handleBlur"
     ></el-input>
 
     <div class="search-result" v-show="hasData && resultShow">
@@ -17,9 +16,14 @@
             <i class="el-icon-user"></i>歌手
           </h4>
           <ul class="result-list">
-            <li class="search-item border-bottom" v-for="item of singerResult" :key="item._id">
-              <router-link :to="'/singer/' + item._id" v-html="item.value"></router-link>
-            </li>
+            <router-link
+              class="search-item border-bottom"
+              tag="li"
+              v-for="item of singerResult"
+              :key="item._id"
+              :to="'/singer/' + item._id"
+              v-html="item.value"
+            ></router-link>
           </ul>
         </div>
 
@@ -28,9 +32,15 @@
             <i class="el-icon-collection"></i>专辑
           </h4>
           <ul class="result-list">
-            <li class="search-item border-bottom" v-for="item of albumResult" :key="item._id">
-              <router-link :to="'/album/' + item._id" v-html="item.value"></router-link>
-            </li>
+            <router-link
+              tag="li"
+              class="search-item border-bottom"
+              v-for="item of albumResult"
+              :key="item._id"
+              :to="'/album/' + item._id"
+              v-html="item.value"
+              @click="handleBlur"
+            ></router-link>
           </ul>
         </div>
       </div>
@@ -49,6 +59,17 @@ export default {
   created() {
     this.getSingers();
     this.getAlbums();
+  },
+  mounted() {
+    document.addEventListener("click", e => {
+      window.console.log(e.target);
+      if (
+        e.target.className != "el-input__inner" &&
+        e.target.className != "search-item"
+      ) {
+        this.resultShow = false;
+      }
+    });
   },
   data() {
     return {

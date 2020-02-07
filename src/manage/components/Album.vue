@@ -9,9 +9,9 @@
     <!-- 列表 -->
     <el-table :data="albums" class="list">
       <el-table-column prop="album_name" label="专辑名" width="200"></el-table-column>
-      <el-table-column prop="price" label="价格">
+      <el-table-column prop="introduce" label="简介">
         <template slot-scope="scope">
-          <span v-if="scope.row.price">{{ scope.row.price}}</span>
+          <span v-if="scope.row.introduce">{{ scope.row.introduce}}</span>
           <span v-else>暂无</span>
         </template>
       </el-table-column>
@@ -51,9 +51,9 @@
           <span class="detail-desc">专辑名称：</span>
           <span>{{album.album_name}}</span>
         </p>
-        <p v-if="album.price">
-          <span class="detail-desc">价格：</span>
-          <span>{{album.price}}</span>
+        <p v-if="album.introduce">
+          <span class="detail-desc">简介：</span>
+          <span>{{album.introduce}}</span>
         </p>
         <div v-if="album.singers.length">
           <span class="detail-desc">歌手：</span>
@@ -81,8 +81,8 @@
         <el-form-item label="专辑名称" prop="album_name">
           <el-input v-model="album.album_name" placeholder="请输入专辑名"></el-input>
         </el-form-item>
-        <el-form-item label="专辑价格">
-          <el-input v-model.number="album.price" type="number" placeholder="请输入价格"></el-input>
+        <el-form-item label="专辑简介">
+          <el-input v-model="album.introduce" type="textarea" placeholder="请输入专辑简介"></el-input>
         </el-form-item>
         <el-form-item label="歌手" class="singers-box">
           <el-tag
@@ -138,8 +138,8 @@
         <el-form-item label="专辑名称" prop="album_name">
           <el-input placeholder="请输入专辑名称" v-model="album.album_name"></el-input>
         </el-form-item>
-        <el-form-item label="专辑价格">
-          <el-input placeholder="请输入专辑价格" v-model="album.price"></el-input>
+        <el-form-item label="专辑简介">
+          <el-input placeholder="请输入专辑简介" type="textarea" v-model="album.introduce"></el-input>
         </el-form-item>
         <el-form-item label="歌手" class="singers-box">
           <el-tag
@@ -229,7 +229,7 @@ export default {
       url: "http://localhost:3000/albums",
       uploadUrl: "http://localhost:3000/upload",
       singerUrl: "http://localhost:3000/singers",
-      album: { album_name: "", price: "", cover: "", singers: [] },
+      album: { album_name: "", introduce: "", cover: "", singers: [] },
       addVisible: false,
       editVisible: false,
       detailVisible: false,
@@ -281,7 +281,7 @@ export default {
     },
     // 初始化
     albumInit() {
-      this.album = { album_name: "", price: "", cover: "", singers: [] };
+      this.album = { album_name: "", introduce: "", cover: "", singers: [] };
     },
     // 处理singers_id
     handleSingersId() {

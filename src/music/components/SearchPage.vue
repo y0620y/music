@@ -98,15 +98,19 @@
         </div>
       </el-tab-pane>
     </el-tabs>
+
+    <common-footer></common-footer>
   </div>
 </template>
 
 <script>
 import _ from "lodash";
 import TopHeader from "./Header";
+import CommonFooter from "./Footer";
 export default {
   components: {
-    TopHeader
+    TopHeader,
+    CommonFooter
   },
   props: {
     type: String

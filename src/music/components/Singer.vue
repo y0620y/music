@@ -1,43 +1,48 @@
 <template>
-  <div class="singer-wrap">
-    <top-header></top-header>
+  <div>
+    <div class="singer-wrap">
+      <top-header></top-header>
 
-    <ul class="singer-list">
-      <router-link
-        tag="li"
-        class="item border-bottom"
-        v-for="(item, index) in singers"
-        :key="index"
-        :to="'/singer/' + item._id"
-      >
-        <div class="img-wrap">
-          <img :src="item.cover " />
-        </div>
-        <div class="item-info">
-          <span>{{item.singer_name}}</span>
-        </div>
-      </router-link>
-    </ul>
+      <ul class="singer-list">
+        <router-link
+          tag="li"
+          class="item border-bottom"
+          v-for="(item, index) in singers"
+          :key="index"
+          :to="'/singer/' + item._id"
+        >
+          <div class="img-wrap">
+            <img :src="item.cover " />
+          </div>
+          <div class="item-info">
+            <span>{{item.singer_name}}</span>
+          </div>
+        </router-link>
+      </ul>
 
-    <!-- 分页 -->
-    <el-pagination
-      class="pagination-box"
-      background
-      layout="prev, pager, next"
-      :total="total"
-      :page-size="pageSize"
-      :current-page.sync="pageNum"
-      @current-change="handleCurrentChange"
-    ></el-pagination>
+      <!-- 分页 -->
+      <el-pagination
+        class="pagination-box"
+        background
+        layout="prev, pager, next"
+        :total="total"
+        :page-size="pageSize"
+        :current-page.sync="pageNum"
+        @current-change="handleCurrentChange"
+      ></el-pagination>
+    </div>
+    <common-footer></common-footer>
   </div>
 </template>
 
 <script>
 import TopHeader from "./Header";
+import CommonFooter from "./Footer";
 
 export default {
   components: {
-    TopHeader
+    TopHeader,
+    CommonFooter
   },
   created() {
     this.getList();
@@ -97,7 +102,7 @@ export default {
   .singer-list {
     width: 900px;
     margin: 0 auto;
-    padding: 40px;
+    padding: 30px 40px;
     overflow: hidden;
     li {
       float: left;
@@ -128,8 +133,9 @@ export default {
   // 分页
   .pagination-box {
     width: 900px;
-    margin: 10px auto;
+    margin: 10px auto 30px auto;
     text-align: center;
+    padding-bottom: 116px;
   }
 }
 </style>

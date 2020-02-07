@@ -1,33 +1,39 @@
 <template>
   <div class="album-wrap">
-    <top-header></top-header>我的收藏
-    <ul class="album-list">
-      <router-link
-        tag="li"
-        class="item border-bottom"
-        v-for="(item, index) in albums"
-        :key="index"
-        :to="'/album/' + item._id"
-      >
-        <div class="img-wrap">
-          <img :src="item.cover" />
-        </div>
-        <div class="item-info">
-          <span>{{item.album_name}}</span>
-        </div>
-      </router-link>
-    </ul>
+    <top-header></top-header>
+    <div class="album-box" v-if="albums.length">
+      <ul class="album-list">
+        <router-link
+          tag="li"
+          class="item border-bottom"
+          v-for="(item, index) in albums"
+          :key="index"
+          :to="'/album/' + item._id"
+        >
+          <div class="img-wrap">
+            <img :src="item.cover" />
+          </div>
+          <div class="item-info">
+            <span>{{item.album_name}}</span>
+          </div>
+        </router-link>
+      </ul>
 
-    <!-- 分页 -->
-    <el-pagination
-      class="pagination-box"
-      background
-      layout="prev, pager, next"
-      :total="total"
-      :page-size="pageSize"
-      :current-page.sync="pageNum"
-      @current-change="handleCurrentChange"
-    ></el-pagination>
+      <!-- 分页 -->
+      <el-pagination
+        class="pagination-box"
+        background
+        layout="prev, pager, next"
+        :total="total"
+        :page-size="pageSize"
+        :current-page.sync="pageNum"
+        @current-change="handleCurrentChange"
+      ></el-pagination>
+    </div>
+    <div class="no-data" v-else>
+      <i class="el-icon-s-promotion"></i>
+      暂无收藏
+    </div>
   </div>
 </template>
 
@@ -84,35 +90,53 @@ export default {
 
 <style lang="scss" scoped>
 .album-wrap {
-  .album-list {
-    width: 900px;
-    margin: 0 auto;
-    padding: 40px;
-    overflow: hidden;
-    li {
-      float: left;
-      width: 140px;
-      height: 188px;
-      margin: 10px 20px;
-      line-height: 1.4;
+  .album-box {
+    .album-list {
+      width: 900px;
+      margin: 0 auto;
+      padding: 40px;
       overflow: hidden;
-      .img-wrap {
-        img {
+      li {
+        float: left;
+        width: 180px;
+        height: 188px;
+        margin: 10px 20px;
+        line-height: 1.4;
+        overflow: hidden;
+        cursor: pointer;
+        .img-wrap {
+          width: 180px;
+          height: 152px;
+          background: url("../../assets/image/album_bg.png") no-repeat;
+          background-size: contain;
+          img {
+            display: block;
+            width: 152px;
+            height: 152px;
+          }
+        }
+        .item-info {
           width: 140px;
-          height: 140px;
+          margin: 8px 0 2px;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          white-space: nowrap;
+          font-size: 14px;
         }
       }
-      .item-info {
-        margin: 8px 0 2px;
-        font-size: 14px;
-      }
+    }
+    // 分页
+    .pagination-box {
+      width: 900px;
+      margin: 10px auto;
+      text-align: center;
     }
   }
-  // 分页
-  .pagination-box {
-    width: 900px;
-    margin: 10px auto;
+  .no-data {
+    padding: 160px 0;
     text-align: center;
+    font-size: 20px;
+    color: #666;
   }
 }
 </style>

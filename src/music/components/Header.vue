@@ -10,7 +10,7 @@
         :default-active="$route.path"
         class="el-menu"
         mode="horizontal"
-        background-color="#545c64"
+        background-color="#333"
         text-color="#fff"
         active-text-color="#ffd04b"
         @select="handleSelect"
@@ -225,13 +225,14 @@ export default {
 </script>
 <style lang="scss" scoped>
 .top-nav {
-  background-color: rgb(84, 92, 100);
+  background-color: #333;
   .nav-wrap {
     position: relative;
     width: 980px;
     margin: 0 auto;
     .el-menu-item {
       padding: 0 30px;
+      font-size: 16px;
     }
     .top-title-wrap {
       .top-title {

@@ -82,7 +82,7 @@
           <el-input v-model="singer.singer_name" placeholder="请输入歌手名"></el-input>
         </el-form-item>
         <el-form-item label="歌手简介">
-          <el-input v-model="singer.introduce" placeholder="请输入简介"></el-input>
+          <el-input type="textarea" v-model="singer.introduce" placeholder="请输入简介"></el-input>
         </el-form-item>
         <el-form-item label="封面图">
           <el-upload
@@ -119,7 +119,7 @@
           <el-input placeholder="请输入歌手名称" v-model="singer.singer_name"></el-input>
         </el-form-item>
         <el-form-item label="歌手简介">
-          <el-input placeholder="请输入歌手简介" v-model="singer.introduce"></el-input>
+          <el-input type="textarea" placeholder="请输入歌手简介" v-model="singer.introduce"></el-input>
         </el-form-item>
         <el-form-item label="封面图">
           <el-upload

@@ -1,26 +1,70 @@
 <template>
-  <div class="album-wrap">
-    <top-header></top-header>
-    <el-button v-if="collectIndex==-1" @click="addAlbum">收藏</el-button>
-    <el-button v-else @click="removeAlbum">取消收藏</el-button>
-    <div class="img-wrap">
-      <img :src="album.cover " />
+  <div>
+    <div class="detail-wrap">
+      <top-header></top-header>
+      <div class="detail-box">
+        <div class="img-wrap">
+          <img :src="album.cover " />
+        </div>
+        <div class="item-info">
+          <h3 class="item-title">
+            <i class="el-icon-collection"></i>
+            {{album.album_name}}
+          </h3>
+          <p class="item-singer">
+            <i class="el-icon-user"></i>
+            <template v-if="album.singers.length">
+              <router-link
+                class="singer-name"
+                v-for="(item, index) in album.singers"
+                :key="index"
+                :to="'/singer/'+item._id"
+              >{{item.singer_name}}</router-link>
+            </template>
+
+            <span v-else>未知歌手</span>
+          </p>
+          <el-button size="medium" class="collect-btn" v-if="collectIndex==-1" @click="addAlbum">
+            <i class="el-icon-star-off"></i>收藏
+          </el-button>
+          <el-button size="medium" class="collect-btn collect-on-btn" v-else @click="removeAlbum">
+            <i class="el-icon-star-on icon-star-on"></i>已收藏
+          </el-button>
+        </div>
+      </div>
+      <div class="detail-intro">
+        <div class="title-wrap">
+          <h3 class="area-title">
+            <i class="title-icon el-icon-collection"></i>专辑简介
+          </h3>
+        </div>
+        <div v-if="album.introduce" class="intro-content">{{album.introduce}}</div>
+        <div v-else class="intro-content">暂无介绍</div>
+      </div>
     </div>
-    <div class="item-info">
-      <span>{{album.album_name}}</span>
-    </div>
+    <common-footer></common-footer>
   </div>
 </template>
 
 <script>
 import TopHeader from "./Header";
+import CommonFooter from "./Footer";
 import { mapState, mapMutations } from "vuex";
 export default {
   components: {
-    TopHeader
+    TopHeader,
+    CommonFooter
   },
   created() {
     this.getItem();
+  },
+  watch: {
+    $route(to, from) {
+      window.console.log(to);
+      window.console.log(from);
+      this.albumId = this.$route.params.id;
+      this.getItem();
+    }
   },
   computed: {
     ...mapState({
@@ -120,16 +164,88 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.album-wrap {
+.detail-box {
+  width: 800px;
+  margin: 40px auto;
+  overflow: hidden;
   .img-wrap {
+    float: left;
+    width: 320px;
+    height: 271px;
+    background: url("../../assets/image/album_bg.png") no-repeat;
+    background-size: contain;
     img {
-      width: 300px;
-      height: 300px;
+      display: block;
+      width: 268px;
+      height: 268px;
+      border: 1px solid #d5d5d5;
     }
   }
   .item-info {
-    margin: 8px 0 2px;
+    i {
+      margin: 5px;
+    }
+    float: right;
+    width: 420px;
+    margin: 40px 0 2px 60px;
     font-size: 14px;
+    color: #333;
+    .item-title {
+      font-size: 24px;
+      line-height: 40px;
+      font-weight: 400;
+    }
+    .item-singer {
+      font-size: 20px;
+      line-height: 50px;
+      .singer-name {
+        margin-right: 10px;
+        color: #333;
+      }
+    }
+    .collect-btn {
+      width: 120px;
+      height: 40px;
+      line-height: 40px;
+      padding: 0;
+      margin-top: 6px;
+      font-size: 18px;
+      background: #fff;
+      i {
+        font-size: 20px;
+      }
+    }
+    .collect-on-btn {
+      border: 1px solid #f06868;
+      color: #f06868;
+    }
+  }
+}
+
+.detail-intro {
+  width: 860px;
+  margin: 0 auto;
+  padding-bottom: 116px;
+  .title-wrap {
+    margin: 20px auto 10px auto;
+    height: 42px;
+    line-height: 42px;
+    border-bottom: 2px solid #c10d0c;
+    .area-title {
+      display: inline-block;
+      font-size: 20px;
+      .title-icon {
+        margin-right: 5px;
+        color: #c10d0c;
+      }
+    }
+  }
+  .intro-content {
+    min-height: 400px;
+    padding: 20px;
+    line-height: 1.6;
+    font-size: 16px;
+    color: #999;
   }
 }
 </style>

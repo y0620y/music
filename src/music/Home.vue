@@ -1,62 +1,67 @@
 <template>
-  <div class="home-wrap">
-    <top-header></top-header>
+  <div>
+    <div class="home-wrap">
+      <top-header></top-header>
 
-    <div class="album-wrap">
-      <div class="title-wrap">
-        <h3 class="area-title">
-          <i class="title-icon el-icon-collection"></i>新碟首发
-        </h3>
-        <router-link class="area-more" to="/album">更多</router-link>
+      <div class="album-wrap">
+        <div class="title-wrap">
+          <h3 class="area-title">
+            <i class="title-icon el-icon-collection"></i>新碟首发
+          </h3>
+          <router-link class="area-more" to="/album">更多</router-link>
+        </div>
+
+        <swiper :options="swiperOption" class="swiper-wrap">
+          <swiper-slide v-for="(item, index) in albums" :key="index">
+            <router-link class="item border-bottom" :to="'/album/' + item._id">
+              <div class="img-wrap">
+                <img :src="item.cover " />
+              </div>
+            </router-link>
+          </swiper-slide>
+          <div class="swiper-pagination" slot="pagination"></div>
+          <div class="swiper-prev el-icon-arrow-left" slot="button-prev"></div>
+          <div class="swiper-next el-icon-arrow-right" slot="button-next"></div>
+        </swiper>
       </div>
 
-      <swiper :options="swiperOption" class="swiper-wrap">
-        <swiper-slide v-for="(item, index) in albums" :key="index">
-          <router-link class="item border-bottom" :to="'/album/' + item._id">
+      <div class="singer-wrap">
+        <div class="title-wrap">
+          <h3 class="area-title">
+            <i class="title-icon el-icon-collection"></i>歌手推荐
+          </h3>
+          <router-link class="area-more" to="/singer">更多</router-link>
+        </div>
+        <ul class="singer-list">
+          <router-link
+            tag="li"
+            class="item border-bottom"
+            v-for="(item, index) in singers"
+            :key="index"
+            :to="'/singer/' + item._id"
+          >
             <div class="img-wrap">
               <img :src="item.cover " />
             </div>
+            <div class="item-info">
+              <span>{{item.singer_name}}</span>
+            </div>
           </router-link>
-        </swiper-slide>
-        <div class="swiper-pagination" slot="pagination"></div>
-        <div class="swiper-prev el-icon-arrow-left" slot="button-prev"></div>
-        <div class="swiper-next el-icon-arrow-right" slot="button-next"></div>
-      </swiper>
-    </div>
-
-    <div class="singer-wrap">
-      <div class="title-wrap">
-        <h3 class="area-title">
-          <i class="title-icon el-icon-collection"></i>歌手推荐
-        </h3>
-        <router-link class="area-more" to="/singer">更多</router-link>
+        </ul>
       </div>
-      <ul class="singer-list">
-        <router-link
-          tag="li"
-          class="item border-bottom"
-          v-for="(item, index) in singers"
-          :key="index"
-          :to="'/singer/' + item._id"
-        >
-          <div class="img-wrap">
-            <img :src="item.cover " />
-          </div>
-          <div class="item-info">
-            <span>{{item.singer_name}}</span>
-          </div>
-        </router-link>
-      </ul>
     </div>
+    <common-footer></common-footer>
   </div>
 </template>
 
 <script>
 import TopHeader from "./components/Header";
+import CommonFooter from "./components/Footer";
 
 export default {
   components: {
-    TopHeader
+    TopHeader,
+    CommonFooter
   },
   created() {
     this.getAlbum();
@@ -141,7 +146,7 @@ export default {
 <style lang="scss" scoped>
 .album-wrap {
   width: 860px;
-  margin: 0 auto;
+  margin: 30px auto;
   .title-wrap {
     width: 860px;
     margin: 20px auto 10px auto;
@@ -166,7 +171,7 @@ export default {
     .swiper-prev,
     .swiper-next {
       position: absolute;
-      top: 105px;
+      top: 85px;
       width: 35px;
       height: 60px;
       line-height: 60px;
@@ -190,12 +195,15 @@ export default {
       border-bottom-left-radius: 10px;
     }
     .img-wrap {
-      border: 1px solid #d5d5d5;
+      width: 180px;
+      height: 152px;
+      background: url("../assets/image/album_bg.png") no-repeat;
+      background-size: contain;
       width: 266px;
-      height: 266px;
+      height: 225px;
       img {
-        width: 266px;
-        height: 266px;
+        width: 224px;
+        height: 224px;
       }
     }
   }
@@ -203,7 +211,8 @@ export default {
 
 .singer-wrap {
   width: 980px;
-  margin: 0 auto;
+  margin: 30px auto;
+  padding-bottom: 116px;
   .title-wrap {
     width: 860px;
     margin: 30px auto 10px auto;
