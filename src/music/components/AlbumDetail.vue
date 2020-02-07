@@ -1,7 +1,7 @@
 <template>
-  <div>
-    <div class="detail-wrap">
-      <top-header></top-header>
+  <div class="detail-wrap">
+    <top-header></top-header>
+    <div v-if="album && album.album_name">
       <div class="detail-box">
         <div class="img-wrap">
           <img :src="album.cover " />
@@ -42,18 +42,19 @@
         <div v-else class="intro-content">暂无介绍</div>
       </div>
     </div>
-    <common-footer></common-footer>
+    <div class="no-data" v-else>
+      <i class="el-icon-s-promotion"></i>
+      暂无数据
+    </div>
   </div>
 </template>
 
 <script>
 import TopHeader from "./Header";
-import CommonFooter from "./Footer";
 import { mapState, mapMutations } from "vuex";
 export default {
   components: {
-    TopHeader,
-    CommonFooter
+    TopHeader
   },
   created() {
     this.getItem();
@@ -225,7 +226,6 @@ export default {
 .detail-intro {
   width: 860px;
   margin: 0 auto;
-  padding-bottom: 116px;
   .title-wrap {
     margin: 20px auto 10px auto;
     height: 42px;
@@ -247,5 +247,12 @@ export default {
     font-size: 16px;
     color: #999;
   }
+}
+
+.no-data {
+  padding: 160px 0;
+  text-align: center;
+  font-size: 20px;
+  color: #666;
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
-  <div>
-    <div class="detail-wrap">
-      <top-header></top-header>
+  <div class="detail-wrap">
+    <top-header></top-header>
+    <div v-if="singer && singer.singer_name">
       <div class="detail-box">
         <div class="img-wrap">
           <img :src="singer.cover " />
@@ -54,17 +54,18 @@
         </el-tab-pane>
       </el-tabs>
     </div>
-    <common-footer></common-footer>
+    <div class="no-data" v-else>
+      <i class="el-icon-s-promotion"></i>
+      暂无数据
+    </div>
   </div>
 </template>
 
 <script>
 import TopHeader from "./Header";
-import CommonFooter from "./Footer";
 export default {
   components: {
-    TopHeader,
-    CommonFooter
+    TopHeader
   },
   created() {
     this.getItem();
@@ -209,11 +210,11 @@ export default {
       }
     }
   }
-  .no-data {
-    padding: 60px 0;
-    text-align: center;
-    font-size: 20px;
-    color: #666;
-  }
+}
+.no-data {
+  padding: 160px 0;
+  text-align: center;
+  font-size: 20px;
+  color: #666;
 }
 </style>

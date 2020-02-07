@@ -329,7 +329,7 @@ export default {
     },
     // 删除
     deleteAlbum(album) {
-      this.$confirm("确定删除该文件吗?", "提示", {
+      this.$confirm("确定删除该专辑吗?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"

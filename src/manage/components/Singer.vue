@@ -236,16 +236,27 @@ export default {
       this.$refs[formName].resetFields();
     },
     // 删除
+
     deleteSinger(singer) {
-      fetch(this.url + "/" + singer._id, { method: "DELETE" })
-        .then(res => res.json())
-        .then(data => {
-          if (data.code === 0) {
-            this.showMsg("success", data.msg);
-            this.getList();
-          } else {
-            this.showMsg("error", data.msg);
-          }
+      this.$confirm("确定删除该歌手吗?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          fetch(this.url + "/" + singer._id, { method: "DELETE" })
+            .then(res => res.json())
+            .then(data => {
+              if (data.code === 0) {
+                this.showMsg("success", data.msg);
+                this.getList();
+              } else {
+                this.showMsg("error", data.msg);
+              }
+            });
+        })
+        .catch(() => {
+          this.showMsg("info", "已取消删除");
         });
     },
     // 编辑

@@ -11,7 +11,7 @@
           <router-link class="area-more" to="/album">更多</router-link>
         </div>
 
-        <swiper :options="swiperOption" class="swiper-wrap">
+        <swiper v-if="albums && albums.length" :options="swiperOption" class="swiper-wrap">
           <swiper-slide v-for="(item, index) in albums" :key="index">
             <router-link class="item border-bottom" :to="'/album/' + item._id">
               <div class="img-wrap">
@@ -23,6 +23,11 @@
           <div class="swiper-prev el-icon-arrow-left" slot="button-prev"></div>
           <div class="swiper-next el-icon-arrow-right" slot="button-next"></div>
         </swiper>
+
+        <div class="no-data" v-else>
+          <i class="el-icon-s-promotion"></i>
+          暂无数据
+        </div>
       </div>
 
       <div class="singer-wrap">
@@ -32,7 +37,7 @@
           </h3>
           <router-link class="area-more" to="/singer">更多</router-link>
         </div>
-        <ul class="singer-list">
+        <ul class="singer-list" v-if="singers && singers.length">
           <router-link
             tag="li"
             class="item border-bottom"
@@ -48,6 +53,11 @@
             </div>
           </router-link>
         </ul>
+
+        <div class="no-data" v-else>
+          <i class="el-icon-s-promotion"></i>
+          暂无数据
+        </div>
       </div>
     </div>
     <common-footer></common-footer>
@@ -263,5 +273,11 @@ export default {
       }
     }
   }
+}
+.no-data {
+  padding: 110px 0;
+  text-align: center;
+  font-size: 20px;
+  color: #666;
 }
 </style>

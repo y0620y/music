@@ -1,8 +1,8 @@
 <template>
-  <div>
-    <div class="singer-wrap">
-      <top-header></top-header>
+  <div class="singer-wrap">
+    <top-header></top-header>
 
+    <div v-if="singers && singers.length">
       <ul class="singer-list">
         <router-link
           tag="li"
@@ -31,18 +31,19 @@
         @current-change="handleCurrentChange"
       ></el-pagination>
     </div>
-    <common-footer></common-footer>
+    <div class="no-data" v-else>
+      <i class="el-icon-s-promotion"></i>
+      暂无数据
+    </div>
   </div>
 </template>
 
 <script>
 import TopHeader from "./Header";
-import CommonFooter from "./Footer";
 
 export default {
   components: {
-    TopHeader,
-    CommonFooter
+    TopHeader
   },
   created() {
     this.getList();
@@ -82,12 +83,6 @@ export default {
           }
         });
     },
-    // 搜索
-    // searchList(keyword) {
-    //   this.searchVal = keyword;
-    //   this.pageNum = 1;
-    //   this.getList();
-    // },
     // 分页点击切换
     handleCurrentChange(pageNum) {
       this.pageNum = pageNum;
@@ -135,7 +130,13 @@ export default {
     width: 900px;
     margin: 10px auto 30px auto;
     text-align: center;
-    padding-bottom: 116px;
   }
+}
+
+.no-data {
+  padding: 160px 0;
+  text-align: center;
+  font-size: 20px;
+  color: #666;
 }
 </style>

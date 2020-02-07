@@ -1,7 +1,7 @@
 <template>
   <div class="album-wrap">
     <top-header></top-header>
-    <div class="album-box" v-if="albums.length">
+    <div class="album-box" v-if="albums && albums.length">
       <ul class="album-list">
         <router-link
           tag="li"
