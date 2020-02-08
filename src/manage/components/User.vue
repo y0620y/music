@@ -1,5 +1,6 @@
 <template>
   <div class="user-wrap">
+    <manage-header></manage-header>
     <!-- 搜索 -->
     <user-search type="user" @search="searchList"></user-search>
     <!-- 操作（新增） -->
@@ -122,10 +123,12 @@
 <script>
 import _ from "lodash";
 import UserSearch from "./Search";
+import manageHeader from "./Header";
 
 export default {
   components: {
-    UserSearch
+    UserSearch,
+    manageHeader
   },
   created() {
     this.getList();
@@ -263,7 +266,7 @@ export default {
       type = type || "success";
       msg = msg || "success";
       this.$message({
-        duration: 2000,
+        duration: 1000,
         showClose: true,
         message: msg,
         type: type

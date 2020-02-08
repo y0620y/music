@@ -1,5 +1,6 @@
 <template>
   <div class="singer-wrap">
+    <manage-header></manage-header>
     <!-- 搜索 -->
     <singer-search type="singer" @search="searchList"></singer-search>
     <!-- 操作（新增） -->
@@ -165,10 +166,12 @@
 <script>
 import _ from "lodash";
 import SingerSearch from "./Search";
+import manageHeader from "./Header";
 
 export default {
   components: {
-    SingerSearch
+    SingerSearch,
+    manageHeader
   },
   created() {
     this.getList();
@@ -308,7 +311,7 @@ export default {
       type = type || "success";
       msg = msg || "success";
       this.$message({
-        duration: 2000,
+        duration: 1000,
         showClose: true,
         message: msg,
         type: type

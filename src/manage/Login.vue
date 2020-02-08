@@ -52,7 +52,7 @@ export default {
       type = type || "success";
       msg = msg || "success";
       this.$message({
-        duration: 2000,
+        duration: 1000,
         showClose: true,
         message: msg,
         type: type

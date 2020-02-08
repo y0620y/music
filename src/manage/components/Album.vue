@@ -1,5 +1,6 @@
 <template>
   <div class="album-wrap">
+    <manage-header></manage-header>
     <!-- 搜索 -->
     <album-search type="album" @search="searchList"></album-search>
     <!-- 操作（新增） -->
@@ -17,7 +18,7 @@
       </el-table-column>
       <el-table-column prop="singers" label="歌手名">
         <template slot-scope="scope">
-          <div v-if="scope.row.singers.length">
+          <div v-if="scope.row.singers && scope.row.singers.length">
             <span
               class="row-singer"
               v-for="(item, index) in scope.row.singers"
@@ -34,6 +35,22 @@
           <img :src="scope.row.cover" class="album-cover" />
         </template>
       </el-table-column>
+
+      <el-table-column prop="users" label="收藏的用户">
+        <template slot-scope="scope">
+          <div v-if="scope.row.users && scope.row.users.length">
+            <span
+              class="row-singer"
+              v-for="(item, index) in scope.row.users"
+              :key="index"
+            >{{ item.name }}</span>
+          </div>
+          <div v-else>
+            <span class="row-singer">暂无</span>
+          </div>
+        </template>
+      </el-table-column>
+
       <el-table-column fixed="right" label="操作">
         <template slot-scope="scope">
           <el-button @click="showDetail(scope.row)" type="text" size="small">详情</el-button>
@@ -55,7 +72,7 @@
           <span class="detail-desc">简介：</span>
           <span>{{album.introduce}}</span>
         </p>
-        <div v-if="album.singers.length">
+        <div v-if="album.singers && album.singers.length">
           <span class="detail-desc">歌手：</span>
           <el-tag
             class="singer-tag"
@@ -205,10 +222,12 @@
 <script>
 import _ from "lodash";
 import AlbumSearch from "./Search";
+import manageHeader from "./Header";
 
 export default {
   components: {
-    AlbumSearch
+    AlbumSearch,
+    manageHeader
   },
   created() {
     this.getList();
@@ -415,7 +434,7 @@ export default {
       type = type || "success";
       msg = msg || "success";
       this.$message({
-        duration: 2000,
+        duration: 1000,
         showClose: true,
         message: msg,
         type: type

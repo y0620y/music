@@ -1,7 +1,10 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from "../manage/Home"
+import ManageHome from '../manage/Home'
 import Login from '../manage/Login'
+import AlbumManage from "../manage/components/Album"
+import SingerManage from "../manage/components/Singer"
+import UserManage from "../manage/components/User"
 
 import MusicHome from "../music/Home"
 import SingerDetail from "../music/components/SingerDetail"
@@ -16,14 +19,37 @@ Vue.use(VueRouter)
 const routes = [
   {
     path: '/manage',
-    name: 'Home',
-    component: Home,
+    name: 'ManageHome',
+    component: ManageHome,
+    meta: { requireAuth: true }
+  },
+  {
+    path: '/singerManage',
+    name: 'singerManage',
+    component: SingerManage,
+    meta: { requireAuth: true }
+  },
+  {
+    path: '/albumManage',
+    name: 'albumManage',
+    component: AlbumManage,
+    meta: { requireAuth: true }
+  },
+  {
+    path: '/userManage',
+    name: 'userManage',
+    component: UserManage,
     meta: { requireAuth: true }
   },
   {
     path: '/login',
     name: 'login',
     component: Login
+  },
+  {
+    path: '/',
+    name: 'music',
+    component: MusicHome
   },
   {
     path: '/music',

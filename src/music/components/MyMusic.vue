@@ -39,6 +39,7 @@
 
 <script>
 import TopHeader from "./Header";
+import { mapState } from "vuex";
 
 export default {
   components: {
@@ -46,6 +47,19 @@ export default {
   },
   created() {
     this.getList();
+  },
+  computed: {
+    ...mapState({
+      loginUser: "user"
+    }),
+    username() {
+      return this.loginUser && this.loginUser.name;
+    }
+  },
+  watch: {
+    username() {
+      this.getList();
+    }
   },
   data() {
     return {
@@ -60,7 +74,7 @@ export default {
   methods: {
     // 查询
     getList() {
-      fetch(this.url + "?keyword=" + this.$route.params.username, {
+      fetch(this.url + "?keyword=" + this.username, {
         method: "GET",
         headers: { "Content-Type": "application/json" }
       })
@@ -73,12 +87,6 @@ export default {
           }
         });
     },
-    // 搜索
-    // searchList(keyword) {
-    //   this.searchVal = keyword;
-    //   this.pageNum = 1;
-    //   this.getList();
-    // },
     // 分页点击切换
     handleCurrentChange(pageNum) {
       this.pageNum = pageNum;
