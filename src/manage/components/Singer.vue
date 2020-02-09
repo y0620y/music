@@ -9,8 +9,8 @@
     </div>
     <!-- 列表 -->
     <el-table :data="singers" class="list">
-      <el-table-column prop="singer_name" label="歌手名" width="200"></el-table-column>
-      <el-table-column prop="introduce" label="简介">
+      <el-table-column prop="singer_name" label="歌手名" width="100"></el-table-column>
+      <el-table-column prop="introduce" label="简介" width="300">
         <template slot-scope="scope">
           <span v-if="scope.row.introduce">{{ scope.row.introduce}}</span>
           <span v-else>暂无</span>

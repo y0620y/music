@@ -244,9 +244,10 @@ export default {
   .intro-content {
     min-height: 400px;
     padding: 20px;
-    line-height: 1.6;
+    line-height: 2;
     font-size: 16px;
     color: #999;
+    text-indent: 30px;
   }
 }
 

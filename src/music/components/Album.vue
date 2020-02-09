@@ -55,7 +55,7 @@ export default {
   data() {
     return {
       searchVal: "",
-      pageSize: 10,
+      pageSize: 8,
       pageNum: 1,
       total: 0,
       albumUrl: "http://localhost:3000/albums",

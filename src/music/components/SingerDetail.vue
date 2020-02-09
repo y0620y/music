@@ -182,9 +182,10 @@ export default {
     margin: 0 auto 30px auto;
     .intro-content {
       padding: 20px;
-      line-height: 1.6;
+      line-height: 2;
       font-size: 16px;
       color: #999;
+      text-indent: 30px;
     }
   }
   .album-list {
