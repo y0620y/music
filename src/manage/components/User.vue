@@ -152,7 +152,7 @@ export default {
       pageSize: 5,
       pageNum: 1,
       total: 0,
-      userUrl: "http://localhost:3000/users",
+      userUrl: "http://39.98.147.33:3000/users",
       user: { name: "", root: 0 },
       addVisible: false,
       editVisible: false,

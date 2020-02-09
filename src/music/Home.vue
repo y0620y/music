@@ -128,8 +128,8 @@ export default {
       },
       pageSize: 8,
       pageNum: 1,
-      albumUrl: "http://localhost:3000/albums",
-      singerUrl: "http://localhost:3000/singers",
+      albumUrl: "http://39.98.147.33:3000/albums",
+      singerUrl: "http://39.98.147.33:3000/singers",
       albums: [],
       singers: [],
       hotAlbums: []

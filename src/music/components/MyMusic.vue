@@ -68,7 +68,7 @@ export default {
       pageSize: 10,
       pageNum: 1,
       total: 0,
-      userUrl: "http://localhost:3000/users",
+      userUrl: "http://39.98.147.33:3000/users",
       albums: []
     };
   },

@@ -84,8 +84,8 @@ export default {
   data() {
     return {
       albumId: this.$route.params.id,
-      albumUrl: "http://localhost:3000/albums",
-      userUrl: "http://localhost:3000/users",
+      albumUrl: "http://39.98.147.33:3000/albums",
+      userUrl: "http://39.98.147.33:3000/users",
       album: {},
       user: {}
     };

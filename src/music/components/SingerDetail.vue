@@ -88,7 +88,7 @@ export default {
   data() {
     return {
       singerId: this.$route.params.id,
-      singerUrl: "http://localhost:3000/singers",
+      singerUrl: "http://39.98.147.33:3000/singers",
       singer: {},
       user: {}
     };

@@ -252,8 +252,8 @@ export default {
       pageNum: 1,
       total: 0,
       fileList: [],
-      uploadUrl: "http://localhost:3000/upload",
-      singerUrl: "http://localhost:3000/singers",
+      uploadUrl: "http://39.98.147.33:3000/upload",
+      singerUrl: "http://39.98.147.33:3000/singers",
       singer: {
         singer_name: "",
         introduce: "",

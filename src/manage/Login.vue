@@ -29,7 +29,7 @@
 export default {
   data() {
     return {
-      userUrl: "http://localhost:3000/users",
+      userUrl: "http://39.98.147.33:3000/users",
       inputUser: {},
       rules: {
         name: [

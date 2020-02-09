@@ -27,7 +27,7 @@ export default {
       noData: false,
       pageSize: 5,
       pageNum: 1,
-      albumUrl: "http://localhost:3000/albums",
+      albumUrl: "http://39.98.147.33:3000/albums",
       hotAlbums: [],
       charts: "",
       nameList: [],
