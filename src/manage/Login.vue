@@ -29,7 +29,7 @@
 export default {
   data() {
     return {
-      url: "http://localhost:3000/users",
+      userUrl: "http://localhost:3000/users",
       inputUser: {},
       rules: {
         name: [
@@ -61,7 +61,7 @@ export default {
     login() {
       this.$refs["loginFrom"].validate(valid => {
         if (valid) {
-          fetch(this.url + "/login/admin", {
+          fetch(this.userUrl + "/login/admin", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(this.inputUser)

@@ -19,6 +19,7 @@
         <el-menu-item index="/singerManage">歌手管理</el-menu-item>
         <el-menu-item index="/albumManage">专辑管理</el-menu-item>
         <el-menu-item index="/userManage">用户管理</el-menu-item>
+        <el-menu-item index="/collect">统计</el-menu-item>
         <el-submenu index="4">
           <template slot="title">我的</template>
           <el-menu-item index="4-1" @click="exit">退出</el-menu-item>

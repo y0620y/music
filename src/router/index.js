@@ -5,6 +5,7 @@ import Login from '../manage/Login'
 import AlbumManage from "../manage/components/Album"
 import SingerManage from "../manage/components/Singer"
 import UserManage from "../manage/components/User"
+import UserCollect from "../manage/components/Collect"
 
 import MusicHome from "../music/Home"
 import SingerDetail from "../music/components/SingerDetail"
@@ -39,6 +40,12 @@ const routes = [
     path: '/userManage',
     name: 'userManage',
     component: UserManage,
+    meta: { requireAuth: true }
+  },
+  {
+    path: '/collect',
+    name: 'UserCollect',
+    component: UserCollect,
     meta: { requireAuth: true }
   },
   {

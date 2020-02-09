@@ -16,6 +16,14 @@
           <span v-else>暂无</span>
         </template>
       </el-table-column>
+
+      <el-table-column prop="area" label="地区">
+        <template slot-scope="scope">
+          <span v-if="scope.row.area">{{ scope.row.area}}</span>
+          <span v-else>其他</span>
+        </template>
+      </el-table-column>
+
       <el-table-column prop="cover" label="封面图">
         <template slot-scope="scope">
           <img :src="scope.row.cover" class="singer-cover" />
@@ -45,7 +53,7 @@
     </el-table>
 
     <!-- 详情 -->
-    <el-dialog :visible.sync="detailVisible" width="40%">
+    <el-dialog :visible.sync="detailVisible" width="50%">
       <h3 class="dialog-title">详细信息</h3>
       <div class="detailBox">
         <p>
@@ -60,6 +68,10 @@
           <span class="detail-desc">封面图：</span>
           <img :src="singer.cover" />
         </div>
+        <p v-if="singer.area">
+          <span class="detail-desc">地区：</span>
+          <span>{{singer.area}}</span>
+        </p>
         <div v-if="singer.albums && singer.albums.length">
           <span class="detail-desc">专辑：</span>
           <el-tag
@@ -76,15 +88,26 @@
     </el-dialog>
 
     <!-- 新增 -->
-    <el-dialog :before-close="closeAdd" :visible.sync="addVisible" width="40%">
+    <el-dialog :before-close="closeAdd" :visible.sync="addVisible" width="50%">
       <h3 class="dialog-title">新增歌手</h3>
       <el-form ref="addForm" :rules="rules" label-width="100px" :model="singer" class="add-form">
         <el-form-item label="歌手名称" prop="singer_name">
-          <el-input v-model="singer.singer_name" placeholder="请输入歌手名"></el-input>
+          <el-input :maxlength="40" v-model="singer.singer_name" placeholder="请输入歌手名"></el-input>
         </el-form-item>
         <el-form-item label="歌手简介">
-          <el-input type="textarea" v-model="singer.introduce" placeholder="请输入简介"></el-input>
+          <el-input :maxlength="500" type="textarea" v-model="singer.introduce" placeholder="请输入简介"></el-input>
         </el-form-item>
+        <el-form-item label="地区" prop="area">
+          <el-select v-model="singer.area" placeholder="请选择">
+            <el-option
+              v-for="item in areaOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+
         <el-form-item label="封面图">
           <el-upload
             class="upload-demo"
@@ -93,6 +116,7 @@
             list-type="picture"
             :on-success="uploadSussess"
             :on-remove="clearFiles"
+            :before-upload="beforeUpload"
             ref="singer-upload"
             :limit="1"
           >
@@ -113,14 +137,29 @@
     </el-dialog>
 
     <!-- 修改 -->
-    <el-dialog :before-close="closeEdit" :visible.sync="editVisible" width="40%">
+    <el-dialog :before-close="closeEdit" :visible.sync="editVisible" width="50%">
       <h3 class="dialog-title">修改信息</h3>
       <el-form ref="editForm" :rules="rules" label-width="100px" :model="singer">
         <el-form-item label="歌手名称" prop="singer_name">
-          <el-input placeholder="请输入歌手名称" v-model="singer.singer_name"></el-input>
+          <el-input :maxlength="40" placeholder="请输入歌手名称" v-model="singer.singer_name"></el-input>
         </el-form-item>
         <el-form-item label="歌手简介">
-          <el-input type="textarea" placeholder="请输入歌手简介" v-model="singer.introduce"></el-input>
+          <el-input
+            :maxlength="500"
+            type="textarea"
+            placeholder="请输入歌手简介"
+            v-model="singer.introduce"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="地区" prop="area">
+          <el-select v-model="singer.area" placeholder="请选择">
+            <el-option
+              v-for="item in areaOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="封面图">
           <el-upload
@@ -130,6 +169,7 @@
             list-type="picture"
             :on-success="uploadSussess"
             :on-remove="clearFiles"
+            :before-upload="beforeUpload"
             ref="singer-upload"
             :limit="1"
             :file-list="fileList"
@@ -180,18 +220,47 @@ export default {
     return {
       rules: {
         singer_name: [
-          { required: true, message: "请输入歌手名称", trigger: "blur" }
-        ]
+          { required: true, message: "请输入歌手名称", trigger: "blur" },
+          { min: 1, max: 40, message: "长度在 1 到 40 个字符", trigger: "blur" }
+        ],
+        area: [{ required: true, message: "请选择地区", trigger: "blur" }]
       },
+      areaOptions: [
+        {
+          value: "华语",
+          label: "华语"
+        },
+        {
+          value: "欧美",
+          label: "欧美"
+        },
+        {
+          value: "日本",
+          label: "日本"
+        },
+        {
+          value: "韩国",
+          label: "韩国"
+        },
+        {
+          value: "其他",
+          label: "其他"
+        }
+      ],
       searchVal: "",
       pageSize: 5,
       pageNum: 1,
       total: 0,
       fileList: [],
-      url: "http://localhost:3000/singers",
       uploadUrl: "http://localhost:3000/upload",
       singerUrl: "http://localhost:3000/singers",
-      singer: { singer_name: "", introduce: "", cover: "", singers: [] },
+      singer: {
+        singer_name: "",
+        introduce: "",
+        cover: "",
+        area: "",
+        albums: []
+      },
       addVisible: false,
       editVisible: false,
       detailVisible: false,
@@ -202,6 +271,19 @@ export default {
     };
   },
   methods: {
+    // 上传限制
+    beforeUpload(file) {
+      const isIMG = file.type === "image/jpeg" || file.type === "image/png";
+      const isLt2M = file.size / 1024 / 1024 < 2;
+
+      if (!isIMG) {
+        this.showMsg("error", "上传头像图片只能是 JPG、PNG 格式!");
+      }
+      if (!isLt2M) {
+        this.showMsg("error", "上传头像图片大小不能超过 2MB!");
+      }
+      return isIMG && isLt2M;
+    },
     // 初始化
     singerInit() {
       this.singer = { singer_name: "", introduce: "", cover: "", singers: [] };
@@ -210,7 +292,7 @@ export default {
     addSinger() {
       this.$refs["addForm"].validate(valid => {
         if (valid) {
-          fetch(this.url, {
+          fetch(this.singerUrl, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(this.singer)
@@ -247,7 +329,7 @@ export default {
         type: "warning"
       })
         .then(() => {
-          fetch(this.url + "/" + singer._id, { method: "DELETE" })
+          fetch(this.singerUrl + "/" + singer._id, { method: "DELETE" })
             .then(res => res.json())
             .then(data => {
               if (data.code === 0) {
@@ -265,7 +347,7 @@ export default {
     // 编辑
     editSinger() {
       this.editVisible = false;
-      fetch(this.url, {
+      fetch(this.singerUrl, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(this.singer)
@@ -285,7 +367,7 @@ export default {
     // 查询
     getList() {
       fetch(
-        this.url +
+        this.singerUrl +
           "?keyword=" +
           this.searchVal +
           "&pageSize=" +

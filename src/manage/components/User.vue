@@ -152,7 +152,7 @@ export default {
       pageSize: 5,
       pageNum: 1,
       total: 0,
-      url: "http://localhost:3000/users",
+      userUrl: "http://localhost:3000/users",
       user: { name: "", root: 0 },
       addVisible: false,
       editVisible: false,
@@ -172,7 +172,7 @@ export default {
     addUser() {
       this.$refs["addForm"].validate(valid => {
         if (valid) {
-          fetch(this.url, {
+          fetch(this.userUrl, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(this.user)
@@ -200,7 +200,7 @@ export default {
     },
     // 删除
     deleteUser(user) {
-      fetch(this.url + "/" + user._id, { method: "DELETE" })
+      fetch(this.userUrl + "/" + user._id, { method: "DELETE" })
         .then(res => res.json())
         .then(data => {
           if (data.code === 0) {
@@ -216,7 +216,7 @@ export default {
       this.$refs["editForm"].validate(valid => {
         if (valid) {
           this.editVisible = false;
-          fetch(this.url, {
+          fetch(this.userUrl, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(this.user)
@@ -240,7 +240,7 @@ export default {
     // 查询
     getList() {
       fetch(
-        this.url +
+        this.userUrl +
           "?keyword=" +
           this.searchVal +
           "&pageSize=" +

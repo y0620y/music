@@ -104,7 +104,7 @@ export default {
   data() {
     return {
       user: { name: "", root: 0 },
-      url: "http://localhost:3000/users",
+      userUrl: "http://localhost:3000/users",
       addVisible: false,
       loginVisible: false,
       rules: {
@@ -131,7 +131,7 @@ export default {
     login() {
       this.$refs["loginForm"].validate(valid => {
         if (valid) {
-          fetch(this.url + "/login/user", {
+          fetch(this.userUrl + "/login/user", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(this.user)
@@ -160,7 +160,7 @@ export default {
     addUser() {
       this.$refs["addForm"].validate(valid => {
         if (valid) {
-          fetch(this.url, {
+          fetch(this.userUrl, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(this.user)

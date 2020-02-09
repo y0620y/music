@@ -56,7 +56,7 @@
               :to="'/album/' + item._id"
             >
               <div class="img-wrap">
-                <img :src="item.cover " />
+                <img :src="item.cover || defaultCover" />
               </div>
               <div class="item-info">
                 <span v-html="item.newValue"></span>
@@ -84,7 +84,7 @@
               :to="'/singer/' + item._id"
             >
               <div class="img-wrap">
-                <img :src="item.cover " />
+                <img :src="item.cover || defaultCover" />
               </div>
               <div class="item-info">
                 <span v-html="item.newValue"></span>
@@ -104,6 +104,7 @@
 <script>
 import _ from "lodash";
 import TopHeader from "./Header";
+import { mapState } from "vuex";
 export default {
   components: {
     TopHeader
@@ -218,6 +219,7 @@ export default {
     }
   },
   computed: {
+    ...mapState(["defaultCover"]),
     hasSingerData() {
       return this.singerResult.length;
     },

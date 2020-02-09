@@ -4,7 +4,7 @@
     <div v-if="album && album.album_name">
       <div class="detail-box">
         <div class="img-wrap">
-          <img :src="album.cover " />
+          <img :src="album.cover || defaultCover" />
         </div>
         <div class="item-info">
           <h3 class="item-title">
@@ -69,7 +69,8 @@ export default {
   },
   computed: {
     ...mapState({
-      loginUser: "user"
+      loginUser: "user",
+      defaultCover: "defaultCover"
     }),
     collectIndex() {
       var collect = this.loginUser.collect;
@@ -83,7 +84,7 @@ export default {
   data() {
     return {
       albumId: this.$route.params.id,
-      url: "http://localhost:3000/albums",
+      albumUrl: "http://localhost:3000/albums",
       userUrl: "http://localhost:3000/users",
       album: {},
       user: {}
@@ -148,7 +149,7 @@ export default {
     },
     // 查询
     getItem() {
-      fetch(this.url + "/detail/" + this.albumId, {
+      fetch(this.albumUrl + "/detail/" + this.albumId, {
         method: "GET",
         headers: { "Content-Type": "application/json" }
       })

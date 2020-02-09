@@ -12,7 +12,7 @@
           :to="'/album/' + item._id"
         >
           <div class="img-wrap">
-            <img :src="item.cover " />
+            <img :src="item.cover || defaultCover " />
           </div>
           <div class="item-info">
             <span>{{item.album_name}}</span>
@@ -40,10 +40,14 @@
 
 <script>
 import TopHeader from "./Header";
+import { mapState } from "vuex";
 
 export default {
   components: {
     TopHeader
+  },
+  computed: {
+    ...mapState(["defaultCover"])
   },
   created() {
     this.getList();
@@ -54,7 +58,7 @@ export default {
       pageSize: 10,
       pageNum: 1,
       total: 0,
-      url: "http://localhost:3000/albums",
+      albumUrl: "http://localhost:3000/albums",
       albums: []
     };
   },
@@ -62,7 +66,7 @@ export default {
     // 查询
     getList() {
       fetch(
-        this.url +
+        this.albumUrl +
           "?keyword=" +
           this.searchVal +
           "&pageSize=" +

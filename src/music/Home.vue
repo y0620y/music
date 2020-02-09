@@ -15,7 +15,7 @@
           <swiper-slide v-for="(item, index) in albums" :key="index">
             <router-link class="item border-bottom" :to="'/album/' + item._id">
               <div class="img-wrap">
-                <img :src="item.cover " />
+                <img :src="item.cover || defaultCover" />
               </div>
             </router-link>
           </swiper-slide>
@@ -46,10 +46,39 @@
             :to="'/singer/' + item._id"
           >
             <div class="img-wrap">
-              <img :src="item.cover " />
+              <img :src="item.cover || defaultCover" />
             </div>
             <div class="item-info">
               <span>{{item.singer_name}}</span>
+            </div>
+          </router-link>
+        </ul>
+
+        <div class="no-data" v-else>
+          <i class="el-icon-s-promotion"></i>
+          暂无数据
+        </div>
+      </div>
+
+      <div class="hotAlbum-wrap">
+        <div class="title-wrap">
+          <h3 class="area-title">
+            <i class="title-icon el-icon-collection"></i>热门专辑
+          </h3>
+        </div>
+        <ul class="album-list" v-if="hotAlbums && hotAlbums.length">
+          <router-link
+            tag="li"
+            class="item border-bottom"
+            v-for="(item, index) in hotAlbums"
+            :key="index"
+            :to="'/album/' + item._id"
+          >
+            <div class="img-wrap">
+              <img :src="item.cover || defaultCover" />
+            </div>
+            <div class="item-info">
+              <span>{{item.album_name}}</span>
             </div>
           </router-link>
         </ul>
@@ -67,6 +96,7 @@
 <script>
 import TopHeader from "./components/Header";
 import CommonFooter from "./components/Footer";
+import { mapState } from "vuex";
 
 export default {
   components: {
@@ -76,6 +106,10 @@ export default {
   created() {
     this.getAlbum();
     this.getSinger();
+    this.getHotAlbum();
+  },
+  computed: {
+    ...mapState(["defaultCover"])
   },
   data() {
     return {
@@ -97,7 +131,8 @@ export default {
       albumUrl: "http://localhost:3000/albums",
       singerUrl: "http://localhost:3000/singers",
       albums: [],
-      singers: []
+      singers: [],
+      hotAlbums: []
     };
   },
   methods: {
@@ -119,6 +154,28 @@ export default {
           window.console.log(data);
           if (data.code === 0) {
             this.albums = data.list;
+          }
+        });
+    },
+    // 查询
+    getHotAlbum() {
+      fetch(
+        this.albumUrl +
+          "?pageSize=" +
+          this.pageSize +
+          "&pageNum=" +
+          this.pageNum +
+          "&sort=1",
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" }
+        }
+      )
+        .then(res => res.json())
+        .then(data => {
+          window.console.log(data);
+          if (data.code === 0) {
+            this.hotAlbums = data.list;
           }
         });
     },
@@ -157,25 +214,6 @@ export default {
 .album-wrap {
   width: 860px;
   margin: 30px auto;
-  .title-wrap {
-    width: 860px;
-    margin: 20px auto 10px auto;
-    height: 42px;
-    line-height: 42px;
-    border-bottom: 2px solid #c10d0c;
-    .area-title {
-      display: inline-block;
-      font-size: 20px;
-      .title-icon {
-        margin-right: 5px;
-        color: #c10d0c;
-      }
-    }
-    .area-more {
-      float: right;
-      color: #999;
-    }
-  }
   .swiper-wrap {
     margin-top: 20px;
     .swiper-prev,
@@ -221,27 +259,7 @@ export default {
 
 .singer-wrap {
   width: 980px;
-  margin: 30px auto;
-  padding-bottom: 116px;
-  .title-wrap {
-    width: 860px;
-    margin: 30px auto 10px auto;
-    height: 42px;
-    line-height: 42px;
-    border-bottom: 2px solid #c10d0c;
-    .area-title {
-      display: inline-block;
-      font-size: 20px;
-      .title-icon {
-        margin-right: 5px;
-        color: #c10d0c;
-      }
-    }
-    .area-more {
-      float: right;
-      color: #999;
-    }
-  }
+  margin: 30px auto 0px auto;
   .singer-list {
     width: 900px;
     margin: 0 auto;
@@ -272,6 +290,65 @@ export default {
         font-size: 14px;
       }
     }
+  }
+}
+
+.hotAlbum-wrap {
+  width: 980px;
+  margin: 0 auto 30px auto;
+  padding-bottom: 116px;
+  .album-list {
+    width: 900px;
+    margin: 0 auto;
+    padding: 0 40px;
+    overflow: hidden;
+    li {
+      float: left;
+      width: 180px;
+      height: 188px;
+      background: url("../assets/image/album_bg.png") no-repeat;
+      background-size: contain;
+      margin: 10px 22px;
+      line-height: 1.4;
+      overflow: hidden;
+      cursor: pointer;
+      .img-wrap {
+        border: 1px solid #d5d5d5;
+        img {
+          display: block;
+          width: 152px;
+          height: 152px;
+        }
+      }
+      .item-info {
+        width: 140px;
+        margin: 8px 0 2px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        font-size: 14px;
+      }
+    }
+  }
+}
+
+.title-wrap {
+  width: 860px;
+  margin: 10px auto;
+  height: 42px;
+  line-height: 42px;
+  border-bottom: 2px solid #c10d0c;
+  .area-title {
+    display: inline-block;
+    font-size: 20px;
+    .title-icon {
+      margin-right: 5px;
+      color: #c10d0c;
+    }
+  }
+  .area-more {
+    float: right;
+    color: #999;
   }
 }
 .no-data {

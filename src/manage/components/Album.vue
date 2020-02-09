@@ -61,7 +61,7 @@
     </el-table>
 
     <!-- 详情 -->
-    <el-dialog :visible.sync="detailVisible" width="40%">
+    <el-dialog :visible.sync="detailVisible" width="50%">
       <h3 class="dialog-title">详细信息</h3>
       <div class="detailBox">
         <p>
@@ -92,14 +92,19 @@
     </el-dialog>
 
     <!-- 新增 -->
-    <el-dialog :before-close="closeAdd" :visible.sync="addVisible" width="40%">
+    <el-dialog :before-close="closeAdd" :visible.sync="addVisible" width="50%">
       <h3 class="dialog-title">新增专辑</h3>
       <el-form ref="addForm" :rules="rules" label-width="100px" :model="album" class="add-form">
         <el-form-item label="专辑名称" prop="album_name">
-          <el-input v-model="album.album_name" placeholder="请输入专辑名"></el-input>
+          <el-input :maxlength="40" v-model="album.album_name" placeholder="请输入专辑名"></el-input>
         </el-form-item>
         <el-form-item label="专辑简介">
-          <el-input v-model="album.introduce" type="textarea" placeholder="请输入专辑简介"></el-input>
+          <el-input
+            :maxlength="500"
+            v-model="album.introduce"
+            type="textarea"
+            placeholder="请输入专辑简介"
+          ></el-input>
         </el-form-item>
         <el-form-item label="歌手" class="singers-box">
           <el-tag
@@ -129,6 +134,7 @@
             list-type="picture"
             :on-success="uploadSussess"
             :on-remove="clearFiles"
+            :before-upload="beforeUpload"
             ref="album-upload"
             :limit="1"
           >
@@ -149,14 +155,19 @@
     </el-dialog>
 
     <!-- 修改 -->
-    <el-dialog :before-close="closeEdit" :visible.sync="editVisible" width="40%">
+    <el-dialog :before-close="closeEdit" :visible.sync="editVisible" width="50%">
       <h3 class="dialog-title">修改信息</h3>
       <el-form ref="editForm" :rules="rules" label-width="100px" :model="album">
         <el-form-item label="专辑名称" prop="album_name">
-          <el-input placeholder="请输入专辑名称" v-model="album.album_name"></el-input>
+          <el-input :maxlength="40" placeholder="请输入专辑名称" v-model="album.album_name"></el-input>
         </el-form-item>
         <el-form-item label="专辑简介">
-          <el-input placeholder="请输入专辑简介" type="textarea" v-model="album.introduce"></el-input>
+          <el-input
+            :maxlength="500"
+            placeholder="请输入专辑简介"
+            type="textarea"
+            v-model="album.introduce"
+          ></el-input>
         </el-form-item>
         <el-form-item label="歌手" class="singers-box">
           <el-tag
@@ -186,6 +197,7 @@
             list-type="picture"
             :on-success="uploadSussess"
             :on-remove="clearFiles"
+            :before-upload="beforeUpload"
             ref="album-upload"
             :limit="1"
             :file-list="fileList"
@@ -237,7 +249,8 @@ export default {
     return {
       rules: {
         album_name: [
-          { required: true, message: "请输入专辑名称", trigger: "blur" }
+          { required: true, message: "请输入专辑名称", trigger: "blur" },
+          { min: 1, max: 40, message: "长度在 1 到 40 个字符", trigger: "blur" }
         ]
       },
       searchVal: "",
@@ -245,7 +258,7 @@ export default {
       pageNum: 1,
       total: 0,
       fileList: [],
-      url: "http://localhost:3000/albums",
+      albumUrl: "http://localhost:3000/albums",
       uploadUrl: "http://localhost:3000/upload",
       singerUrl: "http://localhost:3000/singers",
       album: { album_name: "", introduce: "", cover: "", singers: [] },
@@ -260,6 +273,19 @@ export default {
     };
   },
   methods: {
+    // 上传限制
+    beforeUpload(file) {
+      const isIMG = file.type === "image/jpeg" || file.type === "image/png";
+      const isLt2M = file.size / 1024 / 1024 < 2;
+
+      if (!isIMG) {
+        this.showMsg("error", "上传头像图片只能是 JPG、PNG 格式!");
+      }
+      if (!isLt2M) {
+        this.showMsg("error", "上传头像图片大小不能超过 2MB!");
+      }
+      return isIMG && isLt2M;
+    },
     // Autocomplete
     querySearchAsync(queryString, cb) {
       var singers = this.singers;
@@ -318,7 +344,7 @@ export default {
       this.$refs["addForm"].validate(valid => {
         if (valid) {
           this.handleSingersId();
-          fetch(this.url, {
+          fetch(this.albumUrl, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(this.album)
@@ -354,7 +380,7 @@ export default {
         type: "warning"
       })
         .then(() => {
-          fetch(this.url + "/" + album._id, { method: "DELETE" })
+          fetch(this.albumUrl + "/" + album._id, { method: "DELETE" })
             .then(res => res.json())
             .then(data => {
               if (data.code === 0) {
@@ -373,7 +399,7 @@ export default {
     editAlbum() {
       this.editVisible = false;
       this.handleSingersId();
-      fetch(this.url, {
+      fetch(this.albumUrl, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(this.album)
@@ -393,7 +419,7 @@ export default {
     // 查询
     getList() {
       fetch(
-        this.url +
+        this.albumUrl +
           "?keyword=" +
           this.searchVal +
           "&pageSize=" +

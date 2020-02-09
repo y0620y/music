@@ -11,7 +11,7 @@
           :to="'/album/' + item._id"
         >
           <div class="img-wrap">
-            <img :src="item.cover" />
+            <img :src="item.cover || defaultCover" />
           </div>
           <div class="item-info">
             <span>{{item.album_name}}</span>
@@ -50,7 +50,8 @@ export default {
   },
   computed: {
     ...mapState({
-      loginUser: "user"
+      loginUser: "user",
+      defaultCover: "defaultCover"
     }),
     username() {
       return this.loginUser && this.loginUser.name;
@@ -67,14 +68,14 @@ export default {
       pageSize: 10,
       pageNum: 1,
       total: 0,
-      url: "http://localhost:3000/users",
+      userUrl: "http://localhost:3000/users",
       albums: []
     };
   },
   methods: {
     // 查询
     getList() {
-      fetch(this.url + "?keyword=" + this.username, {
+      fetch(this.userUrl + "?keyword=" + this.username, {
         method: "GET",
         headers: { "Content-Type": "application/json" }
       })

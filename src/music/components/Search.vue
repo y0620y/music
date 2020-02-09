@@ -227,6 +227,9 @@ export default {
         overflow: hidden;
         text-overflow: ellipsis;
         .search-item {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
           a {
             color: #333;
           }

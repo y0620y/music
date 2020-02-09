@@ -4,10 +4,12 @@
     <div v-if="singer && singer.singer_name">
       <div class="detail-box">
         <div class="img-wrap">
-          <img :src="singer.cover " />
+          <img :src="singer.cover ||defaultCover" />
         </div>
         <div class="item-info">
           <h3 class="item-title">{{singer.singer_name}}</h3>
+
+          <p class="item-area">{{singer.area}}</p>
         </div>
       </div>
 
@@ -39,7 +41,7 @@
                 :to="'/album/' + item._id"
               >
                 <div class="img-wrap">
-                  <img :src="item.cover " />
+                  <img :src="item.cover || defaultCover" />
                 </div>
                 <div class="item-info">
                   <span v-html="item.album_name"></span>
@@ -63,12 +65,17 @@
 
 <script>
 import TopHeader from "./Header";
+import { mapState } from "vuex";
+
 export default {
   components: {
     TopHeader
   },
   created() {
     this.getItem();
+  },
+  computed: {
+    ...mapState(["defaultCover"])
   },
   watch: {
     $route(to, from) {
@@ -81,7 +88,7 @@ export default {
   data() {
     return {
       singerId: this.$route.params.id,
-      url: "http://localhost:3000/singers",
+      singerUrl: "http://localhost:3000/singers",
       singer: {},
       user: {}
     };
@@ -89,7 +96,7 @@ export default {
   methods: {
     // 查询
     getItem() {
-      fetch(this.url + "/detail/" + this.singerId, {
+      fetch(this.singerUrl + "/detail/" + this.singerId, {
         method: "GET",
         headers: { "Content-Type": "application/json" }
       })
@@ -134,6 +141,10 @@ export default {
       font-size: 24px;
       line-height: 40px;
       font-weight: 400;
+    }
+    .item-area {
+      margin-top: 10px;
+      font-size: 18px;
     }
     .item-singer {
       font-size: 20px;
